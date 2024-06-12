@@ -20,6 +20,19 @@ module ksa
     logic [7:0] address;
     logic [7:0] ram_in;
     logic [7:0] ram_out;
+    logic done;
+
+
+    ram_initializer initializer(
+        .enable(SW[0]),
+        .clk(clk),
+        .write_enable(write_enable),
+        .ram_in(ram_in),
+        .address(address),
+        .done(done)
+    );
+
+
 
     //read enable is by default high
     ramcore S (
@@ -30,7 +43,7 @@ module ksa
         .q(ram_out)
     );
 
-
+/*
     always @(posedge clk) begin
         if(rst) begin
             address <= 0;
@@ -51,7 +64,7 @@ module ksa
         end
     end
 
-
+*/
 
                                       
 
