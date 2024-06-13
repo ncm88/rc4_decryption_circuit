@@ -11,22 +11,31 @@ module ram_initializer
         output logic [RAM_WIDTH - 1 : 0] ram_in,
         output logic [RAM_WIDTH - 1 : 0] address,
 
-        output logic done
+        output logic finished
     );
 
     logic [RAM_WIDTH - 1 : 0] next_ram_in;
     logic [RAM_WIDTH - 1 : 0] next_address;
 
     logic enable;
-    logic next_done;
+    logic done, next_done;
 
 
-    trap_edge trapper(
+    trap_edge enable_trapper(
         .clk(clk),
         .reset(done),
         .async_sig(start),
         .trapped_edge(enable)
     );
+
+
+    trap_edge finish_trapper(
+        .clk(clk),
+        .reset(enable),
+        .async_sig(done),
+        .trapped_edge(finished)
+    );
+
 
     assign write_enable = enable;
     
@@ -43,7 +52,7 @@ module ram_initializer
                 next_ram_in = 0;
             end
         end
-        else begin //thinks its at 256
+        else begin 
             if(enable) next_done = 1;
             else next_done = 0;
             next_address = 0;
