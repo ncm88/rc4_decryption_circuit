@@ -5,4 +5,11 @@ Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  
 Top level modules:
 	trap_edge
 
+} {} {}} C:/Users/nolan/Desktop/projects/rc4_decryptor/sims/ram_initializer_tb.sv {1 {vlog -work work -sv -stats=none C:/Users/nolan/Desktop/projects/rc4_decryptor/sims/ram_initializer_tb.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module ram_initializer_tb
+
+Top level modules:
+	ram_initializer_tb
+
 } {} {}}
