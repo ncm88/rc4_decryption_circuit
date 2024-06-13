@@ -1,0 +1,8 @@
+C:/Users/nolan/Desktop/projects/rc4_decryptor/src/trap_edge.sv {1 {vlog -work work -sv -stats=none C:/Users/nolan/Desktop/projects/rc4_decryptor/src/trap_edge.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module trap_edge
+
+Top level modules:
+	trap_edge
+
+} {} {}}
