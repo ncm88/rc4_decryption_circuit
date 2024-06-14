@@ -23,9 +23,9 @@ module ksa
 
     ramcontroller controller(
         .clk(clk),
-        .mode(SW[3:1]),
-        .start(KEY[0]),
-        .reset(SW[0]),
+        .mode(3'b001),
+        .start(KEY[1]),
+        .reset(KEY[0]),
         .finished_bus(finished_bus),
         .wrenbus(wrenbus),
         .ram_in(ram_in),
