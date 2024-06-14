@@ -8,13 +8,13 @@ module ramcontroller
     )
     (
         input logic clk,
-        
+        input logic reset,
         //////////////////////////////////////////Function select
         input logic [2:0] mode,
         input logic start,
         output logic [NUM_DEVICES - 1:0] finished_bus,
         ////////////////////////////////////////RAM IO
-        output logic [NUM_DEVICES : 0 ] wrenbus,
+        output logic [NUM_DEVICES - 1: 0 ] wrenbus,
         output logic [NUM_DEVICES*RAM_WIDTH - 1 : 0] ram_in,
         output logic [NUM_DEVICES*RAM_WIDTH - 1 : 0] address
     );
@@ -24,7 +24,7 @@ module ramcontroller
     logic initializer_write_enable;
     logic [RAM_WIDTH-1 : 0] initializer_ram_in;
     logic [RAM_WIDTH-1 : 0] initializer_address;
-
+    logic state;
 
     logic [RAM_SIZE - 1 : RAM_WIDTH - 1] working_mem;
 
@@ -34,7 +34,9 @@ module ramcontroller
         .finished(finished_bus[0]),
         .write_enable(initializer_write_enable),
         .ram_in(initializer_ram_in),
-        .address(initializer_address)
+        .address(initializer_address),
+        .state(state),
+        .reset(reset)
     );
 
     always_comb begin

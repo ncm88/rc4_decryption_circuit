@@ -7,6 +7,7 @@ module ramcontroller_tb();
     logic clk;
     logic [2:0] mode;
     logic start;
+    logic reset;
 
     assign mode = 3'b001;
 
@@ -17,7 +18,8 @@ module ramcontroller_tb();
         .finished_bus(finished_bus),
         .wrenbus(wrenbus),
         .ram_in(ram_in),
-        .address(address)
+        .address(address),
+        .reset(reset)
     );
 
     always begin
@@ -29,7 +31,10 @@ module ramcontroller_tb();
     initial begin
         clk = 0;
         start = 0;
+        reset = 1;
         #150
+        reset = 0;
+        #7
         start = 1;
         #1700
         start = 0;
