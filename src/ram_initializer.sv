@@ -1,17 +1,18 @@
-
 module ram_initializer
     #(
         parameter RAM_WIDTH = 8
     )
     (
         input logic clk,
-        input logic start,
         
+        //////////////////////////////////// CONTROL
+        input logic start,
+        output logic finished,
+        
+        ////////////////////////////////////////////RAM IO
         output logic write_enable,
         output logic [RAM_WIDTH - 1 : 0] ram_in,
-        output logic [RAM_WIDTH - 1 : 0] address,
-
-        output logic finished
+        output logic [RAM_WIDTH - 1 : 0] address
     );
 
     logic [RAM_WIDTH - 1 : 0] next_ram_in;
@@ -74,8 +75,5 @@ module ram_initializer
             done <= next_done;
         end
     end
-
-
-
 
 endmodule
