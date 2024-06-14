@@ -23,14 +23,13 @@ module ksa
 
     ramcontroller controller(
         .clk(clk),
-        .start(SW[0]),
         .mode(SW[3:1]),
+        .start(KEY[0]),
+        .reset(SW[0]),
         .finished_bus(finished_bus),
         .wrenbus(wrenbus),
-        .address(address),
         .ram_in(ram_in),
-        .callback(LEDR[1:0]),
-        .enCaught(LEDR[4])
+        .address(address)
     );
 
 
