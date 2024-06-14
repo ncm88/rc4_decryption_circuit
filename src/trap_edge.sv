@@ -1,22 +1,21 @@
 module trap_edge
     (
         input logic clk,
-        input logic reset,
-        input logic async_sig,
-        output logic trapped_edge
+        input logic in,
+        output logic out
     );
 
-    logic last_async;
+    logic last_in;
+    logic next_out;
 
-    always_ff @( posedge clk or posedge reset ) begin 
-        if(reset) begin
-            trapped_edge <= 0;
-            last_async <= 0;
-        end
-        else if(async_sig && ~last_async) trapped_edge <= 1;
+    always_comb begin
+        if(in && ~last_in) next_out = 1;
+        else next_out = 0;
+    end
 
-        else trapped_edge <= trapped_edge;
-        last_async <= async_sig;
+    always_ff @( posedge clk ) begin 
+        out <= next_out;
+        last_in <= in;
     end
 
 endmodule

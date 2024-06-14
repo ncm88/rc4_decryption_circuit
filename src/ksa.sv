@@ -3,7 +3,7 @@ module ksa
         input CLOCK_50,
         input [3:0] KEY,
         input [9:0] SW,
-        input [9:0] LEDR,
+        output [9:0] LEDR,
         input [6:0] HEX0,
         input [6:0] HEX1,
         input [6:0] HEX2,
@@ -12,24 +12,25 @@ module ksa
         input [6:0] HEX5
     );
 
-    logic clk, rst, write_enable;
+    logic clk, rst, write_enable, finished_bus, wrenbus;
     
     assign clk = CLOCK_50;
-    assign rst = SW[0];
 
     logic [7:0] address;
     logic [7:0] ram_in;
     logic [7:0] ram_out;
-    logic done;
 
 
-    ram_initializer initializer(
-        .enable(SW[0]),
+    ramcontroller controller(
         .clk(clk),
-        .write_enable(write_enable),
-        .ram_in(ram_in),
+        .start(SW[0]),
+        .mode(SW[3:1]),
+        .finished_bus(finished_bus),
+        .wrenbus(wrenbus),
         .address(address),
-        .done(done)
+        .ram_in(ram_in),
+        .callback(LEDR[1:0]),
+        .enCaught(LEDR[4])
     );
 
 
@@ -39,33 +40,8 @@ module ksa
         .address(address),
         .clock(clk),
         .data(ram_in),
-        .wren(write_enable),
+        .wren(wrenbus),
         .q(ram_out)
     );
-
-/*
-    always @(posedge clk) begin
-        if(rst) begin
-            address <= 0;
-            ram_in <= 0;
-            write_enable <= 0;
-        end
-
-        else if(address < 255) begin
-            address <= address + 1;
-            ram_in <= ram_in + 1;
-            write_enable <= 1;
-        end
-
-        else begin
-            address <= address;
-            ram_in <= ram_in;
-            write_enable <= 0;
-        end
-    end
-
-*/
-
-                                      
 
 endmodule

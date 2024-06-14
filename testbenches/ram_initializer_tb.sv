@@ -1,8 +1,9 @@
 module ram_initializer_tb();
 
-    logic clk, start, write_enable, finished;
+    logic clk, start, write_enable, finished, state, reset;
     logic [7:0] ram_in;
     logic [7:0] address;
+
 
     ram_initializer DUT(
         .clk(clk),
@@ -10,7 +11,9 @@ module ram_initializer_tb();
         .write_enable(write_enable),
         .ram_in(ram_in),
         .address(address),
-        .finished(finished)
+        .finished(finished),
+        .state(state),
+        .reset(reset)
     );
 
 
@@ -21,8 +24,13 @@ module ram_initializer_tb();
 
 
     initial begin
+        reset = 0;
         clk = 0;
         start = 0;
+        #60
+        reset = 1;
+        #30
+        reset = 0;
         #150
         start = 1;
         #1700
