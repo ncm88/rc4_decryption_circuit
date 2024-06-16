@@ -1,6 +1,7 @@
 module ram_initializer
     #(
         parameter RAM_WIDTH = 8,
+        parameter RAM_LENGTH = 8,
         parameter START_INDEX = 0,
         parameter END_INDEX = 255
     )
@@ -9,26 +10,24 @@ module ram_initializer
         input logic reset,
         //////////////////////////////////// CONTROL
         input logic start,
-        output logic state,
         output logic finished,
         ////////////////////////////////////////////RAM IO
         output logic write_enable,
         output logic [RAM_WIDTH - 1 : 0] ram_in,
-        output logic [RAM_WIDTH - 1 : 0] address
+        output logic [RAM_LENGTH - 1 : 0] address
     );
 
 
     logic next_write_enable, next_finished;
     logic [RAM_WIDTH - 1 : 0] next_ram_in;
-    logic [RAM_WIDTH - 1 : 0] next_address;
+    logic [RAM_LENGTH - 1 : 0] next_address;
 
     typedef enum logic {
         AWAIT_START = 1'b0,
         RUNNING = 1'b1
     } state_t;
 
-    state_t curr_state, next_state;
-    assign state = curr_state;
+    state_t state, next_state;
 
     logic start_sig;
 
@@ -40,7 +39,7 @@ module ram_initializer
 
 
     always_comb begin
-        case(curr_state)
+        case(state)
             AWAIT_START: begin
                 if(start_sig) next_state = RUNNING;
                 else next_state = AWAIT_START;
@@ -56,14 +55,14 @@ module ram_initializer
 
     always_ff @( posedge clk ) begin 
         if(reset)begin
-            curr_state <= AWAIT_START;
+            state <= AWAIT_START;
             ram_in <= 0;
             address <= 0;
             write_enable <= 0;
             finished <= 0;
         end
         else begin
-            curr_state <= next_state;
+            state <= next_state;
             ram_in <= next_ram_in;
             address <= next_address;
             write_enable <= next_write_enable;

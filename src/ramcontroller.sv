@@ -3,7 +3,7 @@
 module ramcontroller
     #(
         parameter RAM_WIDTH = 8,
-        parameter NUM_DEVICES = 1,
+        parameter NUM_DEVICES = 2,
         parameter RAM_SIZE = 256
     )
     (
@@ -24,9 +24,6 @@ module ramcontroller
     logic initializer_write_enable;
     logic [RAM_WIDTH-1 : 0] initializer_ram_in;
     logic [RAM_WIDTH-1 : 0] initializer_address;
-    logic state;
-
-    logic [RAM_SIZE - 1 : RAM_WIDTH - 1] working_mem;
 
     ram_initializer intializer(
         .clk(clk),
