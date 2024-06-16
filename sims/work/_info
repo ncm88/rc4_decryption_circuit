@@ -10,15 +10,15 @@ cModel Technology
 dC:/intelFPGA_lite/18.1
 vram_initializer
 Z0 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
-Z1 !s110 1718385374
+Z1 !s110 1718564612
 !i10b 1
-!s100 f7DTZ<1kZ4n>65Q6aG;nG3
-I20>?]oZ;?^M83M4J]GFA21
+!s100 oMgf6U2m9lUl07fo5[;=;2
+IXazCF;AHTmbeIM05^`DzX0
 Z2 VDg1SIo80bB@j0V0VzS_@n1
 !s105 ram_initializer_sv_unit
 S1
 Z3 dC:/Users/nolan/Desktop/projects/rc4_decryptor/sims
-w1718384194
+w1718490314
 8C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv
 FC:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv
 L0 1
@@ -26,7 +26,7 @@ Z4 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z5 !s108 1718385374.000000
+Z5 !s108 1718564612.000000
 !s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv|
 !i113 1
@@ -56,17 +56,65 @@ R5
 !i113 1
 R6
 R7
+vram_shuffler
+R0
+Z8 !s110 1718564613
+!i10b 1
+!s100 jMTkR2X7hCFGfaWJVz5AB3
+I>>zjb`X>3J?oDO^@^NMV[0
+R2
+!s105 ram_shuffler_sv_unit
+S1
+R3
+w1718564573
+8C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_shuffler.sv
+FC:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_shuffler.sv
+L0 14
+R4
+r1
+!s85 0
+31
+Z9 !s108 1718564613.000000
+!s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_shuffler.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_shuffler.sv|
+!i113 1
+R6
+R7
+vram_shuffler_tb
+R0
+R8
+!i10b 1
+!s100 aNoO1I>^naJ3o74^QZ7LC1
+IhM9eQ:I8VgQnTc:7`fc9R3
+R2
+!s105 ram_shuffler_tb_sv_unit
+S1
+R3
+w1718564598
+8C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/ram_shuffler_tb.sv
+FC:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/ram_shuffler_tb.sv
+L0 1
+R4
+r1
+!s85 0
+31
+R9
+!s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/ram_shuffler_tb.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/ram_shuffler_tb.sv|
+!i113 1
+R6
+R7
 vramcontroller
 R0
 R1
 !i10b 1
-!s100 RE9H_RMMB9L?05lAEcXi?2
-ICDPn^TMDOIVh0APKEFOiK2
+!s100 dcRB8G;Soj<Vz3Bec7SjV2
+IYaE5?AMJjbU6`onCgeJXU1
 R2
 !s105 ramcontroller_sv_unit
 S1
 R3
-w1718385189
+w1718484580
 8C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ramcontroller.sv
 FC:/Users/nolan/Desktop/projects/rc4_decryptor/src/ramcontroller.sv
 L0 3
