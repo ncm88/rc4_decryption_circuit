@@ -17,7 +17,8 @@ module ram_shuffler
         parameter RAM_LENGTH = 8,
         parameter KEY_LENGTH = 3,       //Number of bytes in our key
         parameter START_INDEX = 0,
-        parameter END_INDEX = 255
+        parameter END_INDEX = 255,
+        parameter USE_TAPS = 0
     )
     (
         input logic clk,
@@ -31,7 +32,7 @@ module ram_shuffler
         
         output logic write_enable,
         output logic [RAM_WIDTH - 1 : 0] ram_in,
-        output logic [RAM_LENGTH - 1 : 0] address,
+        output logic [RAM_LENGTH - 1 : 0] address/*,
 
         /////////////////////////////////////TEST
         output logic [7:0] iTap,
@@ -41,6 +42,7 @@ module ram_shuffler
         output logic writeTap,
         output logic [7:0] siTap,
         output logic [7:0] sjTap
+        */
     );
 
     /////CHANGE AS NEEDED
