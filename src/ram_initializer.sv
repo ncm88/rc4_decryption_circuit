@@ -44,10 +44,13 @@ module ram_initializer
                 if(start_sig) next_state = RUNNING;
                 else next_state = AWAIT_START;
             end
+            
             RUNNING: begin
                 if(address < END_INDEX) next_state = RUNNING;
                 else next_state = AWAIT_START;
             end
+
+            default: next_state = AWAIT_START;
         endcase
     end
 
@@ -77,7 +80,7 @@ module ram_initializer
                 next_ram_in = START_INDEX;
                 if(start_sig) next_write_enable = 1;
                 else next_write_enable = 0;
-                next_finished = 0;
+                next_finished = finished;
             end
 
             RUNNING: begin
@@ -93,6 +96,13 @@ module ram_initializer
                     next_write_enable = 0;
                     next_finished = 1;
                 end
+            end
+
+            default: begin
+                next_address = START_INDEX;
+                next_ram_in = START_INDEX;
+                next_write_enable = 0;
+                next_finished = 0;
             end
 
         endcase

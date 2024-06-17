@@ -12,7 +12,6 @@ module ram_initializer_tb();
         .ram_in(ram_in),
         .address(address),
         .finished(finished),
-        .state(state),
         .reset(reset)
     );
 

@@ -39,7 +39,7 @@ module ksa
 
     assign clk = CLOCK_50;
     logic start, next_start;
-    logic finished, next_finished, finish_sig;
+    logic finished, next_finished;
 
     logic [23:0] switch_key;
     assign switch_key = {14'b0,SW[9:1], 1'b0};
@@ -101,12 +101,12 @@ module ksa
             end
 
             INIT_RAM: begin
-                if(finish_sig) next_state = SHUFFLE_RAM;
+                if(finished) next_state = SHUFFLE_RAM;
                 else next_state = INIT_RAM;
             end
 
             SHUFFLE_RAM: begin
-                if(finish_sig) next_state = IDLE;
+                if(finished) next_state = IDLE;
                 else next_state = SHUFFLE_RAM;
             end
 
@@ -124,15 +124,11 @@ module ksa
             mode <= IDLE_MODE;
             start <= 0;
             finished <= 0;
-            finish_sig <= 0;
         end else begin
             state <= next_state;
             mode <= next_mode;
             start <= next_start;
             finished <= next_finished;
-
-            if(next_finished && ~finished) finish_sig <= 1;
-            else finish_sig <= 0;
         end
     end
 
