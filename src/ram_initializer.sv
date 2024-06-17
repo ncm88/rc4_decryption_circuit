@@ -80,7 +80,7 @@ module ram_initializer
                 next_ram_in = START_INDEX;
                 if(start_sig) next_write_enable = 1;
                 else next_write_enable = 0;
-                next_finished = finished;
+                next_finished = 0;
             end
 
             RUNNING: begin

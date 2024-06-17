@@ -8,33 +8,81 @@ z2
 !i10f 100
 cModel Technology
 dC:/intelFPGA_lite/18.1
-vram_initializer
+varcfour
 Z0 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
-Z1 !s110 1718585792
+Z1 !s110 1718592346
 !i10b 1
-!s100 kCJQ];G=;_P5nDUI3S_cj3
-IPR9AZ]@m;HPn61h]089;K0
+!s100 ^RV;C6mVj9G:fU=E]E@fR0
+IkGMCmeDeNgc>SJN7H9bPZ3
 Z2 VDg1SIo80bB@j0V0VzS_@n1
-!s105 ram_initializer_sv_unit
+!s105 arcfour_sv_unit
 S1
 Z3 dC:/Users/nolan/Desktop/projects/rc4_decryptor/sims
-w1718585108
-8C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv
-FC:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv
+w1718592155
+8C:/Users/nolan/Desktop/projects/rc4_decryptor/src/arcfour.sv
+FC:/Users/nolan/Desktop/projects/rc4_decryptor/src/arcfour.sv
 L0 1
 Z4 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z5 !s108 1718585792.000000
-!s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv|
-!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv|
+Z5 !s108 1718592346.000000
+!s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/arcfour.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/arcfour.sv|
 !i113 1
 Z6 o-work work -sv
 Z7 tCvgOpt 0
-vram_initializer_tb
+varcfour_tb
 R0
 R1
+!i10b 1
+!s100 9A7Bn:LEf>N2KaVjLR36H2
+I63mD^H8UAKRI2@dF3@@]i0
+R2
+!s105 arcfour_tb_sv_unit
+S1
+R3
+w1718592342
+8C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/arcfour_tb.sv
+FC:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/arcfour_tb.sv
+L0 1
+R4
+r1
+!s85 0
+31
+R5
+!s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/arcfour_tb.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/arcfour_tb.sv|
+!i113 1
+R6
+R7
+vram_initializer
+R0
+Z8 !s110 1718592345
+!i10b 1
+!s100 A=Fg0c@hGEGG9IR4?gM143
+I5SmVM^d=iHY8OTCcdVM[;3
+R2
+!s105 ram_initializer_sv_unit
+S1
+R3
+w1718592315
+8C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv
+FC:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv
+L0 1
+R4
+r1
+!s85 0
+31
+Z9 !s108 1718592345.000000
+!s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv|
+!i113 1
+R6
+R7
+vram_initializer_tb
+R0
+R8
 !i10b 1
 !s100 Wb`RMdIN0`ZFJg@C;DmZ43
 IY_5z`50gFHgaV0eH>ZEAV2
@@ -50,7 +98,7 @@ R4
 r1
 !s85 0
 31
-R5
+R9
 !s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/ram_initializer_tb.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/ram_initializer_tb.sv|
 !i113 1
@@ -58,15 +106,15 @@ R6
 R7
 vram_shuffler
 R0
-R1
+R8
 !i10b 1
-!s100 QOlIP>_f?J3KA=9Jz[2AA0
-Id6IW`z[6HP6NPlkXV7TKC0
+!s100 h=_nW^IagkAcGBmK^XR<;0
+I]^9^YS=7hEkLhF:]fLO]e2
 R2
 !s105 ram_shuffler_sv_unit
 S1
 R3
-w1718585784
+w1718592331
 8C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_shuffler.sv
 FC:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_shuffler.sv
 L0 14
@@ -74,7 +122,7 @@ R4
 r1
 !s85 0
 31
-R5
+R9
 !s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_shuffler.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_shuffler.sv|
 !i113 1
@@ -108,13 +156,13 @@ vramcontroller
 R0
 R1
 !i10b 1
-!s100 c22Z[?e9fP62H4JYa]L870
-IlkKMcII5S<UdJj9hL@LWo0
+!s100 @o_0FEYNDQZeWL_zgXK<T3
+IWc`?R<YCbC8ed`28GJG>D0
 R2
 !s105 ramcontroller_sv_unit
 S1
 R3
-w1718585407
+w1718591583
 8C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ramcontroller.sv
 FC:/Users/nolan/Desktop/projects/rc4_decryptor/src/ramcontroller.sv
 L0 3
@@ -154,7 +202,7 @@ R6
 R7
 vtrap_edge
 R0
-R1
+R8
 !i10b 1
 !s100 [TFJZc0Idg]>E]=Vgc?in3
 Ie_mIbL^K[kzlGQ029[i;;2
@@ -170,7 +218,7 @@ R4
 r1
 !s85 0
 31
-R5
+R9
 !s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/trap_edge.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/trap_edge.sv|
 !i113 1

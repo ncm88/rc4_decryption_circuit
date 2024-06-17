@@ -1,3 +1,5 @@
+`default_nettype none
+
 module ksa
     (
         input CLOCK_50,
@@ -76,7 +78,8 @@ module ksa
         .ram_out(ram_out),
         .address(address),
         .ram_in(ram_in),
-        .write_enable(write_enable)
+        .write_enable(write_enable),
+        .key(switch_key)
     );
 
 
@@ -118,7 +121,7 @@ module ksa
 
 
 
-    always_ff begin
+    always_ff @(posedge clk) begin
         if(reset)begin
             state <= IDLE;
             mode <= IDLE_MODE;
@@ -141,11 +144,6 @@ module ksa
             default: next_mode = IDLE_MODE;
         endcase
     end
-
-
-
-
-
 
 
 
