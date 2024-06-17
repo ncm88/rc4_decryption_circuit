@@ -17,7 +17,16 @@ module arcfour
         output logic arcfour_finished,
 
         output logic [2:0] state_tap,
-        output logic [1:0] fTap
+        output logic [1:0] fTap,
+
+        output logic[7:0]iTap,
+        output logic[7:0]jTap,
+        output logic[7:0]siTap,
+        output logic[7:0]sjTap,
+        output logic readTap, 
+        output logic writeTap,
+        output logic fStartTap
+
     );
 
     logic next_arcfour_finished;
@@ -46,7 +55,13 @@ module arcfour
         .address(address),
         .ram_in(ram_in),
         .write_enable(write_enable),
-        .key(key)
+        .key(key),
+        .iTap(iTap),
+        .jTap(jTap),
+        .siTap(siTap),
+        .sjTap(sjTap),
+        .readTap(readTap),
+        .writeTap(writeTap)
     );
 
 
@@ -105,6 +120,6 @@ module arcfour
         end
     end
 
-
+    assign fStartTap = start;
 
 endmodule

@@ -3,7 +3,7 @@ module arcfour_tb();
     logic [7:0] ram_out;
     logic [7:0] address;
     logic write_enable;
-    logic finished;
+    logic arcfour_finished;
     logic clk;
     logic [2:0] state;
     logic start;
@@ -18,13 +18,14 @@ module arcfour_tb();
     logic[7:0]siTap;
     logic[7:0]sjTap;
     logic readTap, writeTap;
+    logic fStartTap;
 
     arcfour RC(
         .clk(clk),
         .reset(reset),
         .key(key),
         .start_sig(start),
-        .arcfour_finished(finished),
+        .arcfour_finished(arcfour_finished),
         .ram_out(ram_out),
         .write_enable(write_enable),
         .ram_in(ram_in),
@@ -36,7 +37,8 @@ module arcfour_tb();
         .siTap(siTap),
         .sjTap(sjTap),
         .readTap(readTap),
-        .writeTap(writeTap)
+        .writeTap(writeTap),
+        .fStartTap(fStartTap)
     );
 
 

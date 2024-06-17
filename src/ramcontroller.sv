@@ -20,7 +20,16 @@ module ramcontroller
         
         output logic write_enable,
         output logic [RAM_WIDTH - 1 : 0] ram_in,
-        output logic [RAM_WIDTH - 1 : 0] address
+        output logic [RAM_WIDTH - 1 : 0] address,
+
+
+        output logic[7:0]iTap,
+        output logic[7:0]jTap,
+        output logic[7:0]siTap,
+        output logic[7:0]sjTap,
+        output logic readTap, 
+        output logic writeTap
+
     );
 
     logic [NUM_DEVICES - 1 : 0] start_bus;
@@ -43,12 +52,6 @@ module ramcontroller
         .address(address_bus[0])
     );
 
-    /**/
-    logic[7:0]iTap;
-    logic[7:0]jTap;
-    logic[7:0]siTap;
-    logic[7:0]sjTap;
-
 
     ram_shuffler shuffler(
         .clk(clk),
@@ -63,7 +66,9 @@ module ramcontroller
         .iTap(iTap),
         .jTap(jTap),
         .siTap(siTap),
-        .sjTap(sjTap)
+        .sjTap(sjTap),
+        .readTap(readTap),
+        .writeTap(writeTap)
     );
 
     logic [2:0] curr_mode;
