@@ -43,6 +43,12 @@ module ramcontroller
         .address(address_bus[0])
     );
 
+    /**/
+    logic[7:0]iTap;
+    logic[7:0]jTap;
+    logic[7:0]siTap;
+    logic[7:0]sjTap;
+
 
     ram_shuffler shuffler(
         .clk(clk),
@@ -53,13 +59,20 @@ module ramcontroller
         .key(key),
         .write_enable(write_enable_bus[1]),
         .ram_in(ram_in_bus[1]),
-        .address(address_bus[1])
+        .address(address_bus[1]),
+        .iTap(iTap),
+        .jTap(jTap),
+        .siTap(siTap),
+        .sjTap(sjTap)
     );
 
-
+    logic [2:0] curr_mode;
+    always_ff @(posedge clk) begin
+        curr_mode <= mode;
+    end
 
     always_comb begin
-        case(mode)
+        case(curr_mode)
 
             //Initialize RAM
             3'b001: begin   

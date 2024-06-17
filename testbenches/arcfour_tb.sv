@@ -13,6 +13,12 @@ module arcfour_tb();
     assign key = {24'b0};
     assign ram_out = 0;
 
+    logic[7:0]iTap;
+    logic[7:0]jTap;
+    logic[7:0]siTap;
+    logic[7:0]sjTap;
+    logic readTap, writeTap;
+
     arcfour RC(
         .clk(clk),
         .reset(reset),
@@ -24,7 +30,13 @@ module arcfour_tb();
         .ram_in(ram_in),
         .address(address),
         .state_tap(state),
-        .fTap(fTap)
+        .fTap(fTap),
+        .iTap(iTap),
+        .jTap(jTap),
+        .siTap(siTap),
+        .sjTap(sjTap),
+        .readTap(readTap),
+        .writeTap(writeTap)
     );
 
 
@@ -46,7 +58,11 @@ module arcfour_tb();
         start = 0;
         #60
         start = 1;
+        #100
+        start = 0;
         #12000
+        start = 1;
+        #5000
         start = 0;
     end
 

@@ -10,15 +10,15 @@ cModel Technology
 dC:/intelFPGA_lite/18.1
 varcfour
 Z0 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
-Z1 !s110 1718593988
+Z1 !s110 1718604228
 !i10b 1
-!s100 X2d12d`7WVkPXE<>QgMdO3
-I1BMf4nBHRh>VBR]POff[63
+!s100 7[^>fUZ@BN:n18A^0e2Jk0
+IjJGY7SXP2f:z51V?KJbWS1
 Z2 VDg1SIo80bB@j0V0VzS_@n1
 !s105 arcfour_sv_unit
 S1
 Z3 dC:/Users/nolan/Desktop/projects/rc4_decryptor/sims
-w1718593883
+w1718604172
 8C:/Users/nolan/Desktop/projects/rc4_decryptor/src/arcfour.sv
 FC:/Users/nolan/Desktop/projects/rc4_decryptor/src/arcfour.sv
 L0 1
@@ -26,7 +26,7 @@ Z4 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z5 !s108 1718593988.000000
+Z5 !s108 1718604228.000000
 !s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/arcfour.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/arcfour.sv|
 !i113 1
@@ -36,13 +36,13 @@ varcfour_tb
 R0
 R1
 !i10b 1
-!s100 E5EMzjI>Ifz31Xgl]Qk`G0
-I=i<1655_W7`VDiXDBjTDT0
+!s100 2_ig5;<la0k8:Bf>MfRMD1
+ITh=[6KO<O_@X5C67B=:R42
 R2
 !s105 arcfour_tb_sv_unit
 S1
 R3
-w1718592711
+w1718604178
 8C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/arcfour_tb.sv
 FC:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/arcfour_tb.sv
 L0 1
@@ -58,7 +58,7 @@ R6
 R7
 vram_initializer
 R0
-Z8 !s110 1718593987
+!s110 1718604227
 !i10b 1
 !s100 A=Fg0c@hGEGG9IR4?gM143
 I5SmVM^d=iHY8OTCcdVM[;3
@@ -74,7 +74,7 @@ R4
 r1
 !s85 0
 31
-Z9 !s108 1718593987.000000
+Z8 !s108 1718604227.000000
 !s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv|
 !i113 1
@@ -82,7 +82,7 @@ R6
 R7
 vram_initializer_tb
 R0
-R8
+R1
 !i10b 1
 !s100 Wb`RMdIN0`ZFJg@C;DmZ43
 IY_5z`50gFHgaV0eH>ZEAV2
@@ -98,7 +98,7 @@ R4
 r1
 !s85 0
 31
-R9
+R5
 !s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/ram_initializer_tb.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/ram_initializer_tb.sv|
 !i113 1
@@ -114,7 +114,7 @@ R2
 !s105 ram_shuffler_sv_unit
 S1
 R3
-w1718593508
+w1718598391
 8C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_shuffler.sv
 FC:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_shuffler.sv
 L0 14
@@ -156,13 +156,13 @@ vramcontroller
 R0
 R1
 !i10b 1
-!s100 @o_0FEYNDQZeWL_zgXK<T3
-IWc`?R<YCbC8ed`28GJG>D0
+!s100 6_PPLVID?B:<Zgz>Y6hcf2
+I^l=Ke3l][]3U@>^mCXo@c1
 R2
 !s105 ramcontroller_sv_unit
 S1
 R3
-w1718591583
+w1718604049
 8C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ramcontroller.sv
 FC:/Users/nolan/Desktop/projects/rc4_decryptor/src/ramcontroller.sv
 L0 3
@@ -202,7 +202,7 @@ R6
 R7
 vtrap_edge
 R0
-R8
+R1
 !i10b 1
 !s100 [TFJZc0Idg]>E]=Vgc?in3
 Ie_mIbL^K[kzlGQ029[i;;2
@@ -218,7 +218,7 @@ R4
 r1
 !s85 0
 31
-R9
+R8
 !s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/trap_edge.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/trap_edge.sv|
 !i113 1
