@@ -10,7 +10,7 @@ module arcfour_tb();
     logic reset;
     logic [1:0] fTap;
     logic [23:0] key;
-    assign key = {16'b0, 8'b00101000};
+    assign key = {24'b0};
     assign ram_out = 0;
 
     arcfour RC(

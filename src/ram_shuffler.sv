@@ -32,7 +32,7 @@ module ram_shuffler
         
         output logic write_enable,
         output logic [RAM_WIDTH - 1 : 0] ram_in,
-        output logic [RAM_LENGTH - 1 : 0] address/*,
+        output logic [RAM_LENGTH - 1 : 0] address,
 
         /////////////////////////////////////TEST
         output logic [7:0] iTap,
@@ -42,7 +42,6 @@ module ram_shuffler
         output logic writeTap,
         output logic [7:0] siTap,
         output logic [7:0] sjTap
-        */
     );
 
     /////CHANGE AS NEEDED
