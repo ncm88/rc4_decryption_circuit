@@ -153,20 +153,12 @@ module ram_shuffler
 
     //Output logic
     always_comb begin
-        if(i < END_INDEX) begin
-            if((state == WRITE_STATE) && write) next_i = i + 1;
-            else next_i = i;
-        end
-        else begin
-            if((state == WRITE_STATE) && write) next_i = 0;
-            else next_i = i;
-        end
-        
         case(state)
             AWAIT_START: begin
                 next_read = 0;
                 next_write = 0;
                 next_si = 0;
+                next_i = 0;
                 next_j = 0;
                 next_sj = 0;
                 next_address = 0;
@@ -181,7 +173,7 @@ module ram_shuffler
                 
                 if(~read) begin                 //next state is READj
                     next_si = ram_out;
-                    //next_j = j + next_si + key[(KEY_LENGTH - 1) - (i % KEY_LENGTH)];  //implicit modulo 256 via 8-bit overflow
+                    //next_j = j + ram_out + key[(KEY_LENGTH - 1) - (i % KEY_LENGTH)];  //implicit modulo 256 via 8-bit overflow
                     next_j = j + next_si + key[i % KEY_LENGTH];
                     next_sj = sj;
                     
@@ -199,6 +191,7 @@ module ram_shuffler
                     next_write_enable = 1;
                     next_finished = 0;
                 end
+                next_i = i;
             end
 
             WRITE_STATE: begin
@@ -214,7 +207,9 @@ module ram_shuffler
                     next_ram_in = si;
                     next_write_enable = 1;
                     next_finished = 0;
+                    next_i = i;
                 end else begin              //next state is READi
+                    next_i = (i < END_INDEX)? i + 1 : 0;
                     next_address = next_i;
                     next_ram_in = ram_in;
                     next_write_enable = 0;
@@ -227,6 +222,7 @@ module ram_shuffler
                 next_read = 0;
                 next_write = 0;
                 next_si = 0;
+                next_i = 0;
                 next_j = 0;
                 next_sj = 0;
                 next_address = 0;
