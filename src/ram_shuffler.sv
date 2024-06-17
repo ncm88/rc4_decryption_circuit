@@ -181,7 +181,8 @@ module ram_shuffler
                 
                 if(~read) begin                 //next state is READj
                     next_si = ram_out;
-                    next_j = j + next_si + key[(KEY_LENGTH - 1) - (i % KEY_LENGTH)];  //implicit modulo 256 via 8-bit overflow
+                    //next_j = j + next_si + key[(KEY_LENGTH - 1) - (i % KEY_LENGTH)];  //implicit modulo 256 via 8-bit overflow
+                    next_j = j + next_si + key[i % KEY_LENGTH];
                     next_sj = sj;
                     
                     next_address = next_j;

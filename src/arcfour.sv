@@ -25,8 +25,7 @@ module arcfour
         output logic[7:0]sjTap,
         output logic readTap, 
         output logic writeTap,
-        output logic fStartTap
-
+        output logic [1:0] shuffleState
     );
 
     logic next_arcfour_finished;
@@ -40,7 +39,6 @@ module arcfour
     state_t state, next_state;
     assign state_tap = state;
 
-    logic start, next_start;
     logic [1:0] finished;
     logic [1:0] next_finished;
 
@@ -48,7 +46,6 @@ module arcfour
     ramcontroller controller(
         .clk(clk),
         .reset(reset),
-        .start(start),
         .finished(next_finished),
         .mode(state),
         .ram_out(ram_out),
@@ -61,14 +58,14 @@ module arcfour
         .siTap(siTap),
         .sjTap(sjTap),
         .readTap(readTap),
-        .writeTap(writeTap)
+        .writeTap(writeTap),
+        .shuffleState(shuffleState)
     );
 
 
 
     //State transition logic
     always_comb begin
-        next_start = ~start;
         case(state)
             IDLE: begin
                 if(start_sig) begin
@@ -109,17 +106,14 @@ module arcfour
     always_ff @( posedge clk ) begin
         if(reset)begin
             state <= IDLE;
-            start <= 0;
             finished <= 0;
             arcfour_finished <= 0;
         end else begin
             state <= next_state;
-            start <= next_start;
             finished <= next_finished;
             arcfour_finished <= next_arcfour_finished;
         end
     end
 
-    assign fStartTap = start;
 
 endmodule

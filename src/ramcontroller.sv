@@ -13,7 +13,6 @@ module ramcontroller
         input logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] key,
         
         input logic [2:0] mode,
-        input logic start,
         output logic [NUM_DEVICES-1:0] finished,
         ////////////////////////////////////////RAM IO
         input logic [RAM_WIDTH - 1 : 0] ram_out,
@@ -28,8 +27,8 @@ module ramcontroller
         output logic[7:0]siTap,
         output logic[7:0]sjTap,
         output logic readTap, 
-        output logic writeTap
-
+        output logic writeTap,
+        output logic [1:0] shuffleState
     );
 
     logic [NUM_DEVICES - 1 : 0] start_bus;
@@ -68,7 +67,8 @@ module ramcontroller
         .siTap(siTap),
         .sjTap(sjTap),
         .readTap(readTap),
-        .writeTap(writeTap)
+        .writeTap(writeTap),
+        .stateTap(shuffleState)
     );
 
     logic [2:0] curr_mode;
@@ -81,14 +81,14 @@ module ramcontroller
 
             //Initialize RAM
             3'b001: begin   
-                start_bus = {{(NUM_DEVICES - 1){1'b0}}, start};
+                start_bus = {{(NUM_DEVICES - 1){1'b0}}, 1'b1};
                 write_enable = write_enable_bus[0];
                 ram_in = ram_in_bus[0];
                 address = address_bus[0];
             end
 
             3'b010: begin
-                start_bus = {{(NUM_DEVICES - 2){1'b0}}, start, 1'b0};
+                start_bus = {{(NUM_DEVICES - 2){1'b0}}, 1'b1, 1'b0};
                 write_enable = write_enable_bus[1];
                 ram_in = ram_in_bus[1];
                 address = address_bus[1];

@@ -10,15 +10,15 @@ module arcfour_tb();
     logic reset;
     logic [1:0] fTap;
     logic [23:0] key;
-    assign key = {24'b0};
-    assign ram_out = 0;
+    assign key = {23'b0, 1'b1};
+    assign ram_out = {7'b0, 1'b1};
 
     logic[7:0]iTap;
     logic[7:0]jTap;
     logic[7:0]siTap;
     logic[7:0]sjTap;
     logic readTap, writeTap;
-    logic fStartTap;
+    logic [1:0] shuffleState;
 
     arcfour RC(
         .clk(clk),
@@ -38,7 +38,7 @@ module arcfour_tb();
         .sjTap(sjTap),
         .readTap(readTap),
         .writeTap(writeTap),
-        .fStartTap(fStartTap)
+        .shuffleState(shuffleState)
     );
 
 
