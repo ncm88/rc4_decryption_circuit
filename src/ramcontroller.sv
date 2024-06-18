@@ -3,7 +3,7 @@
 module ramcontroller
     #(
         parameter RAM_WIDTH = 8,
-        parameter NUM_DEVICES = 2,
+        parameter NUM_DEVICES = 4,
         parameter KEY_LENGTH = 3
     )
     (
@@ -12,7 +12,7 @@ module ramcontroller
         //////////////////////////////////////////Function select
         input logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] key,
         
-        input logic [2:0] mode,
+        input logic [3:0] mode,
         output logic [NUM_DEVICES-1:0] finished,
         ////////////////////////////////////////RAM IO
         input logic [RAM_WIDTH - 1 : 0] ram_out,
@@ -27,6 +27,14 @@ module ramcontroller
         output logic[7:0]siTap,
         output logic[7:0]sjTap,
         output logic [2:0] shuffleState
+
+        ////////////////////////////////////MESSAGE ROM BLOCK
+
+
+        ///////////////////////////////////ANSWER RAM BLOCK
+
+
+
     );
 
     logic [NUM_DEVICES - 1 : 0] start_bus;
@@ -67,6 +75,12 @@ module ramcontroller
         .stateTap(shuffleState)
     );
 
+
+
+
+
+
+
     logic [2:0] curr_mode;
     always_ff @(posedge clk) begin
         curr_mode <= mode;
@@ -76,14 +90,14 @@ module ramcontroller
         case(curr_mode)
 
             //Initialize RAM
-            3'b001: begin   
+            4'b0001: begin   
                 start_bus = {{(NUM_DEVICES - 1){1'b0}}, 1'b1};
                 write_enable = write_enable_bus[0];
                 ram_in = ram_in_bus[0];
                 address = address_bus[0];
             end
 
-            3'b010: begin
+            4'b0010: begin
                 start_bus = {{(NUM_DEVICES - 2){1'b0}}, 1'b1, 1'b0};
                 write_enable = write_enable_bus[1];
                 ram_in = ram_in_bus[1];

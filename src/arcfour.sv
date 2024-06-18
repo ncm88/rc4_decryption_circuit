@@ -1,7 +1,8 @@
 module arcfour
     #(
         parameter RAM_WIDTH = 8,
-        parameter KEY_LENGTH = 3
+        parameter KEY_LENGTH = 3,
+        parameter NUM_DEVICES = 4
     )
     (
         input logic clk,
@@ -30,17 +31,18 @@ module arcfour
 
     logic next_arcfour_finished;
 
-    typedef enum logic [2:0] {
-        IDLE = 3'b000,
-        INIT_RAM = 3'b001,
-        SHUFFLE_RAM = 3'b010
+    typedef enum logic [3:0] {
+        IDLE = 4'b0000,
+        INIT_RAM = 4'b0001,
+        SHUFFLE_RAM = 4'b0010,
+        READ_MESSAGE = 4'b0100
     } state_t;
 
     state_t state, next_state;
     assign state_tap = state;
 
-    logic [1:0] finished;
-    logic [1:0] next_finished;
+    logic [NUM_DEVICES-1:0] finished;
+    logic [NUM_DEVICES-1:0] next_finished;
 
     assign fTap = finished;
     ramcontroller controller(

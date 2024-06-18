@@ -13,7 +13,8 @@ module rom_loader_tb#(
 
     logic [2:0] state_tap;
     logic [ROM_LENGTH-1:0] address;
-    
+    logic [7:0] out_tap;
+
     logic[ROM_WIDTH-1:0] rom_out;
     assign rom_out = 8'b00000001;
 
@@ -25,7 +26,8 @@ module rom_loader_tb#(
         .address(address),
         .key_arr(key_arr),
         .finished(finished),
-        .state_tap(state_tap)
+        .state_tap(state_tap),
+        .out_tap(out_tap)
     );
 
 

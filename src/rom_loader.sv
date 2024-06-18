@@ -1,6 +1,6 @@
 module rom_loader
     #(
-        parameter KEY_LENGTH = 32,
+        parameter MESSAGE_LENGTH = 32,
         parameter ROM_LENGTH = 5,   //log2 of key length
         parameter ROM_WIDTH = 8
     )
@@ -12,10 +12,11 @@ module rom_loader
         input logic[ROM_WIDTH-1:0] rom_out,
         output logic[ROM_LENGTH-1:0] address,
 
-        output reg [KEY_LENGTH-1:0][ROM_WIDTH-1:0] key_arr,
+        output reg [MESSAGE_LENGTH-1:0][ROM_WIDTH-1:0] key_arr,
         output logic finished,
 
-        output logic [1:0] state_tap
+        output logic [1:0] state_tap,
+        output logic [7:0] out_tap
     );
 
 
@@ -33,11 +34,11 @@ module rom_loader
 
     logic start_sig, jump_next;
 
-    assign jump_next = (state[0]) && (i < KEY_LENGTH-1);
+    assign jump_next = (state[0]) && (i < MESSAGE_LENGTH-1);
     assign next_i = jump_next? i+1 : 0;
     assign finished = state[1];
 
-
+    assign out_tap = key_arr[address];
 
     trap_edge start_trapper(
         .clk(clk),
