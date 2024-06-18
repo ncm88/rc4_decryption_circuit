@@ -48,7 +48,9 @@ module ram_shuffler
         READ_I = 3'b001,
         READ_J = 3'b010,
         WRITE_I = 3'b011,
-        WRITE_J = 3'b100
+        WRITE_J = 3'b100,
+        AWAIT_SI = 3'b101,
+        AWAIT_SJ = 3'b110
     } state_t;
 
     
@@ -88,15 +90,26 @@ module ram_shuffler
     always_comb begin
         case(state)
             AWAIT_START:begin
-                if(start_sig) next_state = READ_I;
+                if(start_sig) next_state = AWAIT_SI;
                 else next_state = AWAIT_START;
                 next_i = 0;
             end
 
+            AWAIT_SI: begin
+                next_state = READ_I;
+                next_i = i;
+            end
+
             READ_I: begin
+                next_state = AWAIT_SJ;
+                next_i = i;
+            end
+
+            AWAIT_SJ: begin
                 next_state = READ_J;
                 next_i = i;
             end
+
 
             READ_J: begin
                 next_state = WRITE_I;
@@ -110,7 +123,7 @@ module ram_shuffler
 
             WRITE_J: begin
                 if(i < END_INDEX)begin
-                    next_state = READ_I;
+                    next_state = AWAIT_SI;
                     next_i = i+1;
                 end
                 else begin
@@ -166,6 +179,16 @@ module ram_shuffler
                 next_write_enable = 0;
             end
 
+            AWAIT_SI: begin
+                next_j = j;
+                next_sj = sj;
+                next_si = si;
+                next_address = address;
+                next_ram_in = ram_in;
+                next_write_enable = write_enable;
+            end
+
+
             READ_I: begin
                 next_sj = sj;
                 next_si = ram_out;
@@ -177,6 +200,17 @@ module ram_shuffler
                 next_write_enable = 0;
             end
             
+
+            AWAIT_SJ: begin
+                next_j = j;
+                next_sj = sj;
+                next_si = si;
+                next_address = address;
+                next_ram_in = ram_in;
+                next_write_enable = write_enable;
+            end
+
+
             READ_J: begin
                 next_sj = ram_out;
                 next_si = si;
