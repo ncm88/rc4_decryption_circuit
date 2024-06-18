@@ -37,18 +37,18 @@ module ram_shuffler
         /////////////////////////////////////TEST
         output logic [7:0] iTap,
         output logic [7:0] jTap,
-        output logic [1:0] stateTap,
-        output logic readTap,
-        output logic writeTap,
+        output logic [2:0] stateTap,
         output logic [7:0] siTap,
         output logic [7:0] sjTap
     );
 
     /////CHANGE AS NEEDED
-    typedef enum logic [1:0] {
-        AWAIT_START = 2'b00,
-        READ_STATE = 2'b01,
-        WRITE_STATE = 2'b10
+    typedef enum logic [2:0] {
+        AWAIT_START = 3'b000,
+        READ_I = 3'b001,
+        READ_J = 3'b010,
+        WRITE_I = 3'b011,
+        WRITE_J = 3'b100
     } state_t;
 
     
@@ -74,9 +74,6 @@ module ram_shuffler
     logic [RAM_LENGTH - 1 : 0] next_address;
     logic [RAM_WIDTH - 1 : 0] next_ram_in;
     logic next_write_enable;
-
-    logic read, next_read;
-    logic write, next_write;
     logic next_finished;
 
 
@@ -86,29 +83,39 @@ module ram_shuffler
     assign siTap = si;
     assign sjTap = sj;
 
-    assign readTap = read;
-    assign writeTap = write;
 
     //state change logic
     always_comb begin
         case(state)
             AWAIT_START:begin
-                if(start_sig) next_state = READ_STATE;
+                if(start_sig) next_state = READ_I;
                 else next_state = AWAIT_START;
+                next_i = 0;
             end
 
-            READ_STATE: begin
-                if(read) next_state = WRITE_STATE;
-                else next_state = READ_STATE;
+            READ_I: begin
+                next_state = READ_J;
+                next_i = i;
             end
 
-            WRITE_STATE: begin
-                if(i < END_INDEX) begin
-                    if(write) next_state = READ_STATE;
-                    else next_state = WRITE_STATE;
-                end else begin
-                    if(write && i >= END_INDEX) next_state = AWAIT_START;
-                    else next_state = WRITE_STATE;
+            READ_J: begin
+                next_state = WRITE_I;
+                next_i = i;
+            end
+
+            WRITE_I: begin
+                next_state = WRITE_J;
+                next_i = i;
+            end
+
+            WRITE_J: begin
+                if(i < END_INDEX)begin
+                    next_state = READ_I;
+                    next_i = i+1;
+                end
+                else begin
+                     next_state = AWAIT_START;
+                     next_i = 0;
                 end
             end
 
@@ -126,9 +133,6 @@ module ram_shuffler
             j <= 0;         //si and j lag i by one
             si <= 0;
             sj <= 0;        //sj lags i by two
-            read <= 0;
-            write <= 0;
-            
             address <= 0;
             ram_in <= 0;
             write_enable <= 0;
@@ -140,9 +144,6 @@ module ram_shuffler
             j <= next_j;
             si <= next_si;
             sj <= next_sj;
-            read <= next_read;
-            write <= next_write;
-
             address <= next_address;
             ram_in <= next_ram_in;
             write_enable <= next_write_enable;
@@ -151,86 +152,65 @@ module ram_shuffler
     end
 
 
+    assign next_finished = (state == WRITE_J)&&(i >= END_INDEX);
+
     //Output logic
     always_comb begin
         case(state)
             AWAIT_START: begin
-                next_read = 0;
-                next_write = 0;
-                next_si = 0;
-                next_i = 0;
                 next_j = 0;
+                next_si = 0;
                 next_sj = 0;
                 next_address = 0;
                 next_ram_in = 0;
                 next_write_enable = 0;
-                next_finished = 0;
+            end
+
+            READ_I: begin
+                next_sj = sj;
+                next_si = ram_out;
+                
+                next_j = j + next_si + key[i % KEY_LENGTH];
+
+                next_address = next_j;
+                next_ram_in = 0;
+                next_write_enable = 0;
             end
             
-            READ_STATE: begin
-                next_read = ~read;
-                next_write = ~write;
-                
-                if(~read) begin                 //next state is READj
-                    next_si = ram_out;
-                    //next_j = j + ram_out + key[(KEY_LENGTH - 1) - (i % KEY_LENGTH)];  //implicit modulo 256 via 8-bit overflow
-                    next_j = j + next_si + key[i % KEY_LENGTH];
-                    next_sj = sj;
-                    
-                    next_address = next_j;
-                    next_ram_in = ram_in;
-                    next_write_enable = 0;
-                    next_finished = 0;
-                end else begin                  //next state is WRITEi, s[i] = s[j]
-                    next_sj = ram_out;
-                    next_si = si;
-                    next_j = j;
-                    
-                    next_address = i;
-                    next_ram_in = next_sj;
-                    next_write_enable = 1;
-                    next_finished = 0;
-                end
-                next_i = i;
+            READ_J: begin
+                next_sj = ram_out;
+                next_si = si;
+
+                next_j = j;
+
+                next_address = i;
+                next_ram_in = next_sj;
+                next_write_enable = 1;
             end
 
-            WRITE_STATE: begin
-                next_read = ~read;
-                next_write = ~write;
-                
+            WRITE_I: begin
+                next_sj = sj;
                 next_si = si;
                 next_j = j;
-                next_sj = sj;
-                
-                if(~write) begin            //next state is WRITEj, s[j] = s[i]
-                    next_address = j;
-                    next_ram_in = si;
-                    next_write_enable = 1;
-                    next_finished = 0;
-                    next_i = i;
-                end else begin              //next state is READi
-                    next_i = (i < END_INDEX)? i + 1 : 0;
-                    next_address = next_i;
-                    next_ram_in = ram_in;
-                    next_write_enable = 0;
-                    next_finished = (i < END_INDEX)? 0 : 1;
-                end
+
+                next_address = j;
+                next_ram_in = si;
+                next_write_enable = 1;
             end
 
+            WRITE_J: begin
+                next_sj = sj;
+                next_si = si;
+                next_j = j;
 
-            default: begin
-                next_read = 0;
-                next_write = 0;
-                next_si = 0;
-                next_i = 0;
-                next_j = 0;
-                next_sj = 0;
-                next_address = 0;
+                next_address = next_i;
                 next_ram_in = 0;
                 next_write_enable = 0;
-                next_finished = 0;
             end
+            
         endcase
     end
 
 endmodule
+
+

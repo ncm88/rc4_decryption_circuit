@@ -26,8 +26,12 @@ module ksa
 
     logic [2:0] state;
     logic [1:0] fTap;
-    logic [23:0] key;
-    assign key = 24'b01001001_00000010_00000000;
+    logic [2:0][7:0] key;
+    //assign key = 24'b01001001_00000010_00000000;
+
+    assign key[0] = 8'b0;
+    assign key[1] = 8'b00000010;
+    assign key[2] = 8'b01001001;
 
     trap_edge start_trapper(
         .clk(clk),

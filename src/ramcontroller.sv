@@ -26,9 +26,7 @@ module ramcontroller
         output logic[7:0]jTap,
         output logic[7:0]siTap,
         output logic[7:0]sjTap,
-        output logic readTap, 
-        output logic writeTap,
-        output logic [1:0] shuffleState
+        output logic [2:0] shuffleState
     );
 
     logic [NUM_DEVICES - 1 : 0] start_bus;
@@ -66,8 +64,6 @@ module ramcontroller
         .jTap(jTap),
         .siTap(siTap),
         .sjTap(sjTap),
-        .readTap(readTap),
-        .writeTap(writeTap),
         .stateTap(shuffleState)
     );
 

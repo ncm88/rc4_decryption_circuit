@@ -17,8 +17,7 @@ module arcfour_tb();
     logic[7:0]jTap;
     logic[7:0]siTap;
     logic[7:0]sjTap;
-    logic readTap, writeTap;
-    logic [1:0] shuffleState;
+    logic [2:0] shuffleState;
 
     arcfour RC(
         .clk(clk),
@@ -36,8 +35,6 @@ module arcfour_tb();
         .jTap(jTap),
         .siTap(siTap),
         .sjTap(sjTap),
-        .readTap(readTap),
-        .writeTap(writeTap),
         .shuffleState(shuffleState)
     );
 

@@ -25,7 +25,7 @@ module arcfour
         output logic[7:0]sjTap,
         output logic readTap, 
         output logic writeTap,
-        output logic [1:0] shuffleState
+        output logic [2:0] shuffleState
     );
 
     logic next_arcfour_finished;
@@ -57,8 +57,6 @@ module arcfour
         .jTap(jTap),
         .siTap(siTap),
         .sjTap(sjTap),
-        .readTap(readTap),
-        .writeTap(writeTap),
         .shuffleState(shuffleState)
     );
 
