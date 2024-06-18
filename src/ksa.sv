@@ -1,3 +1,4 @@
+`default_nettype none
 module ksa
     (
         input CLOCK_50,
@@ -26,6 +27,10 @@ module ksa
 
     logic [2:0] state;
     logic [1:0] fTap;
+    
+    
+    //TODO: get rid of explicit key stuff
+    
     logic [2:0][7:0] key;
     //assign key = 24'b01001001_00000010_00000000;
 
@@ -39,7 +44,6 @@ module ksa
         .out(start_sig)
     );
     
-
 
     arcfour RC(
         .clk(clk),
@@ -56,7 +60,7 @@ module ksa
     );
 
 
-
+    //TODO: integrate ramcore into arcfour module
     //read enable is by default high
     ramcore S (
         .address(address),

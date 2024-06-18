@@ -10,7 +10,7 @@
         6) set s[j] = s[i]
 */
 
-
+//TODO: Remove redundant states, use glitch-free method
 module ram_shuffler
     #(
         parameter RAM_WIDTH = 8,
