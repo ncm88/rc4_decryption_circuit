@@ -21,7 +21,7 @@ module decryptor
 
         input logic [RAM_WIDTH-1:0] kOut,
         output logic [MESSAGE_LOG_LENGTH-1:0] kAddr,
-
+        output logic finished,
 
         output logic [7:0] iTap,
         output logic [7:0] jTap,
@@ -31,7 +31,7 @@ module decryptor
         output logic [7:0] sjTap
     );
 
-    logic increment_k, finished, start_sig;
+    logic increment_k, start_sig;
     logic [RAM_WIDTH-1:0] si, sj, next_si, next_sj;
     logic [RAM_LENGTH-1:0] i, j, next_i, next_j;
     logic [MESSAGE_LOG_LENGTH-1:0] k, next_k;
@@ -48,22 +48,22 @@ module decryptor
         WRITE_ANSWER = 8'b0111_0101,
         FINISHED = 8'b1000_1100
     } state_t;
+
     state_t state, next_state;
 
-    assign increment_k = state[0] && (k < MESSAGE_LENGTH);
+    assign increment_k = state[0] && (k < MESSAGE_LENGTH-1);
     assign sWren = state[1];
     assign aWren = state[2];
     assign finished = state[3];
 
-    assign next_k = increment_k? k + 1 : k;
-    assign next_i = (state == COMPUTE_I)? i+1 : i;
-    assign next_j = (state == READ_SI)? next_si + j : j;
+    assign next_k = (finished)? 0 : (increment_k? k + 1 : k);
+    assign next_i = (finished)? 0 : (state == COMPUTE_I)? i+1 : i;
+    assign next_j = (finished)? 0 : (state == READ_SI)? next_si + j : j;
 
-    assign next_si = (state == READ_SI)? sOut : si;
-    assign next_sj = (state == READ_SJ)? sOut : sj;
+    assign next_si = (finished)? 0 : (state == READ_SI)? sOut : si;
+    assign next_sj = (finished)? 0 : (state == READ_SJ)? sOut : sj;
     
-    assign x = si + sj;
-    assign aIn = x ^ kOut;
+    assign aIn = (si + sj) ^ kOut;
     assign aAddr = k;
     assign kAddr = k;
 
@@ -102,7 +102,7 @@ module decryptor
                 sIn = si;
             end
             AWAIT_SX: begin
-                sAddr = x;
+                sAddr = si + sj;
                 sIn = 0;
             end
 
@@ -134,7 +134,7 @@ module decryptor
             SET_SJ: next_state = AWAIT_SX;
             AWAIT_SX: next_state = WRITE_ANSWER;
             WRITE_ANSWER: next_state = increment_k? COMPUTE_I : FINISHED;
-            FINISHED: next_state = FINISHED;
+            FINISHED: next_state = start_sig? COMPUTE_I : FINISHED;
             default: next_state = AWAIT_START;
         endcase
     end

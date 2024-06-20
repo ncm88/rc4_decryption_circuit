@@ -30,7 +30,7 @@ module decryptor_tb#(
     logic [7:0] stateTap;
     logic [7:0] siTap;
     logic [7:0] sjTap;
-
+    logic finished;
 
     decryptor DUT(
         .clk(clk),
@@ -50,7 +50,8 @@ module decryptor_tb#(
         .kTap(kTap),
         .siTap(siTap),
         .sjTap(sjTap),
-        .stateTap(stateTap)
+        .stateTap(stateTap),
+        .finished(finished)
     );
 
 
@@ -75,6 +76,10 @@ module decryptor_tb#(
         #30
         reset = 0;
         #150
+        start = 1;
+        #8000
+        start = 0;
+        #100
         start = 1;
     end
 
