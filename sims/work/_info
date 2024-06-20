@@ -10,7 +10,7 @@ cModel Technology
 dC:/intelFPGA_lite/16.1
 varcfour
 Z0 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
-Z1 !s110 1718741842
+Z1 !s110 1718857624
 !i10b 1
 !s100 FN72^0@iEUk48@1hRJkSL2
 IP4[n^?;hJlN0JV?@nTn7a2
@@ -26,7 +26,7 @@ Z4 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z5 !s108 1718741842.000000
+Z5 !s108 1718857624.000000
 !s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/arcfour.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/arcfour.sv|
 !i113 1
@@ -56,9 +56,57 @@ R5
 !i113 1
 R6
 R7
+vdecryptor
+R0
+R1
+!i10b 1
+!s100 WCmH4A4Q^9dK=Bgc:01XU2
+ISA?ahb``mdT[okQVV=JK50
+R2
+!s105 decryptor_sv_unit
+S1
+R3
+w1718857616
+8C:/Users/nolan/Desktop/projects/rc4_decryptor/src/decryptor.sv
+FC:/Users/nolan/Desktop/projects/rc4_decryptor/src/decryptor.sv
+L0 1
+R4
+r1
+!s85 0
+31
+R5
+!s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/decryptor.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/decryptor.sv|
+!i113 1
+R6
+R7
+vdecryptor_tb
+R0
+R1
+!i10b 1
+!s100 =Y1HiFHT2L6HP5@VA?4DX2
+IEGWVRGK[[YX2bX;]6C08b1
+R2
+Z8 !s105 decryptor_tb_sv_unit
+S1
+R3
+w1718857102
+8C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/decryptor_tb.sv
+FC:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/decryptor_tb.sv
+L0 3
+R4
+r1
+!s85 0
+31
+R5
+!s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/decryptor_tb.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/decryptor_tb.sv|
+!i113 1
+R6
+R7
 vram_initializer
 R0
-Z8 !s110 1718741841
+Z9 !s110 1718857623
 !i10b 1
 !s100 OI5jjXf^h6gYdo>LjNhN03
 I4l[Si^RN1C3ci@dmYHGAh3
@@ -74,7 +122,7 @@ R4
 r1
 !s85 0
 31
-Z9 !s108 1718741841.000000
+Z10 !s108 1718857623.000000
 !s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_initializer.sv|
 !i113 1
@@ -82,7 +130,7 @@ R6
 R7
 vram_initializer_tb
 R0
-R8
+R9
 !i10b 1
 !s100 Wb`RMdIN0`ZFJg@C;DmZ43
 IY_5z`50gFHgaV0eH>ZEAV2
@@ -98,7 +146,7 @@ R4
 r1
 !s85 0
 31
-R9
+R10
 !s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/ram_initializer_tb.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/testbenches/ram_initializer_tb.sv|
 !i113 1
@@ -122,7 +170,7 @@ R4
 r1
 !s85 0
 31
-R5
+R10
 !s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_shuffler.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ram_shuffler.sv|
 !i113 1
@@ -156,13 +204,13 @@ vramcontroller
 R0
 R1
 !i10b 1
-!s100 g@mdAAVNcCC_d@gPb=i;^0
-IVM>NJH5Vec]NC:gN7iWm>3
+!s100 ]b^8JhVR]gdOmz:z:lYb;2
+IYm=9J^L:^V4[XlggCFM:52
 R2
 !s105 ramcontroller_sv_unit
 S1
 R3
-w1718741780
+w1718742031
 8C:/Users/nolan/Desktop/projects/rc4_decryptor/src/ramcontroller.sv
 FC:/Users/nolan/Desktop/projects/rc4_decryptor/src/ramcontroller.sv
 L0 3
@@ -271,7 +319,7 @@ o-work work
 R7
 vtrap_edge
 R0
-R8
+R9
 !i10b 1
 !s100 [TFJZc0Idg]>E]=Vgc?in3
 Ie_mIbL^K[kzlGQ029[i;;2
@@ -287,9 +335,59 @@ R4
 r1
 !s85 0
 31
-R9
+R10
 !s107 C:/Users/nolan/Desktop/projects/rc4_decryptor/src/trap_edge.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/nolan/Desktop/projects/rc4_decryptor/src/trap_edge.sv|
 !i113 1
 R6
 R7
+vvirtualRAM
+R0
+Z11 !s110 1718827858
+!i10b 1
+!s100 <EaTPi1<6gReGeg[16ON]2
+I60^39fibYl55@i`bgWEcU3
+R2
+R8
+S1
+Z12 dC:/Users/ncm88/Desktop/qprime/rc4_decryption_circuit/sims
+Z13 w1718827852
+Z14 8C:/Users/ncm88/Desktop/qprime/rc4_decryption_circuit/testbenches/decryptor_tb.sv
+Z15 FC:/Users/ncm88/Desktop/qprime/rc4_decryption_circuit/testbenches/decryptor_tb.sv
+L0 124
+R4
+r1
+!s85 0
+31
+Z16 !s108 1718827858.000000
+Z17 !s107 C:/Users/ncm88/Desktop/qprime/rc4_decryption_circuit/testbenches/decryptor_tb.sv|
+Z18 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/ncm88/Desktop/qprime/rc4_decryption_circuit/testbenches/decryptor_tb.sv|
+!i113 1
+R6
+R7
+nvirtual@r@a@m
+vvirtualROM
+R0
+R11
+!i10b 1
+!s100 RNKH`VVBQ8KFnD@V32VYR0
+IJbj;61ChV5CTe:7hK6:HT1
+R2
+R8
+S1
+R12
+R13
+R14
+R15
+L0 145
+R4
+r1
+!s85 0
+31
+R16
+R17
+R18
+!i113 1
+R6
+R7
+nvirtual@r@o@m
