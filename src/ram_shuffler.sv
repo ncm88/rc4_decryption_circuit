@@ -32,14 +32,16 @@ module ram_shuffler
         
         output logic write_enable,
         output logic [RAM_WIDTH - 1 : 0] ram_in,
-        output logic [RAM_LENGTH - 1 : 0] address,
+        output logic [RAM_LENGTH - 1 : 0] address
 
         /////////////////////////////////////TEST
+        /*
         output logic [7:0] iTap,
         output logic [7:0] jTap,
         output logic [2:0] stateTap,
         output logic [7:0] siTap,
         output logic [7:0] sjTap
+        */
     );
 
     /////CHANGE AS NEEDED
@@ -78,13 +80,13 @@ module ram_shuffler
     logic next_write_enable;
     logic next_finished;
 
-
+/*
     assign iTap = i;
     assign jTap = j;
     assign stateTap = state;
     assign siTap = si;
     assign sjTap = sj;
-
+*/
 
     //state change logic
     always_comb begin

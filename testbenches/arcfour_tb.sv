@@ -1,23 +1,36 @@
 module arcfour_tb();
-    logic [7:0] ram_in;
-    logic [7:0] ram_out;
-    logic [7:0] address;
-    logic write_enable;
+    logic [7:0] sIn;
+    logic [7:0] sOut;
+    logic [7:0] sAddr;
+    logic sWren;
+
+    logic [7:0] kOut;
+    logic [4:0] kAddr;
+
+    logic [7:0] aIn;
+    logic [7:0] aAddr;
+    logic aWren;
+
     logic arcfour_finished;
     logic clk;
-    logic [2:0] state;
+    logic [7:0] state;
     logic start;
     logic reset;
-    logic [1:0] fTap;
     logic [23:0] key;
     assign key = 24'b01001001_00000010_00000000;
-    assign ram_out = {7'b0, 1'b1};
+
+    assign sOut = 8'b00011000;
+    assign kOut = 8'b00000011;
+
 
     logic[7:0]iTap;
     logic[7:0]jTap;
     logic[7:0]siTap;
     logic[7:0]sjTap;
-    logic [2:0] shuffleState;
+    logic[7:0]kTap;
+    logic [2:0] fTap;
+    logic [2:0] modeTap;
+    logic wrenTap;
 
     arcfour RC(
         .clk(clk),
@@ -25,17 +38,28 @@ module arcfour_tb();
         .key(key),
         .start_sig(start),
         .arcfour_finished(arcfour_finished),
-        .ram_out(ram_out),
-        .write_enable(write_enable),
-        .ram_in(ram_in),
-        .address(address),
-        .state_tap(state),
-        .fTap(fTap),
+
+        .sOut(sOut),
+        .sWren(sWren),
+        .sIn(sIn),
+        .sAddr(sAddr),
+        
+        .kOut(kOut),
+        .kAddr(kAddr),
+
+        .aWren(aWren),
+        .aIn(aIn),
+        .aAddr(aAddr),
+        
+        .stateTap(state),
+        .kTap(kTap),
         .iTap(iTap),
         .jTap(jTap),
         .siTap(siTap),
         .sjTap(sjTap),
-        .shuffleState(shuffleState)
+        .fTap(fTap),
+        .modeTap(modeTap),
+        .wrenTap(wrenTap)
     );
 
 
@@ -63,6 +87,8 @@ module arcfour_tb();
         start = 1;
         #5000
         start = 0;
+        #1000
+        start = 1;
     end
 
 

@@ -1,65 +1,84 @@
 module arcfour
     #(
         parameter RAM_WIDTH = 8,
+        parameter RAM_LENGTH = 8,
+        parameter NUM_DEVICES = 3,
         parameter KEY_LENGTH = 3,
-        parameter NUM_DEVICES = 4
+        parameter MESSAGE_LOG_LENGTH = 5
     )
     (
         input logic clk,
         input logic reset,
         input logic start_sig,
 
-        input logic [RAM_WIDTH-1:0]ram_out,
         input logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] key,
-
-        output logic [RAM_WIDTH-1:0] address,
-        output logic [RAM_WIDTH-1:0] ram_in,
-        output logic write_enable,
         output logic arcfour_finished,
 
-        output logic [2:0] state_tap,
-        output logic [1:0] fTap,
+        /////////////////////////////RAM-S
+        output logic sWren,
+        input logic [RAM_WIDTH - 1 : 0] sOut,
+        output logic [RAM_WIDTH - 1 : 0] sIn,
+        output logic [RAM_WIDTH - 1 : 0] sAddr,
 
+        ////////////////////////////ROM-K
+        input logic [RAM_WIDTH-1:0] kOut,
+        output logic [MESSAGE_LOG_LENGTH-1:0] kAddr,
+
+        //////////////////////////////RAM-A
+        output logic [RAM_WIDTH-1:0] aIn,
+        output logic [RAM_LENGTH-1:0] aAddr,
+        output logic aWren,
+
+        /////////////////////////////////TEST
         output logic[7:0]iTap,
         output logic[7:0]jTap,
         output logic[7:0]siTap,
         output logic[7:0]sjTap,
-        output logic readTap, 
-        output logic writeTap,
-        output logic [2:0] shuffleState
+        output logic [7:0] stateTap,
+        output logic [7:0] kTap,
+        output logic [2:0] fTap,
+        output logic [2:0] modeTap,
+        output logic wrenTap
     );
 
     logic next_arcfour_finished;
 
-    typedef enum logic [3:0] {
-        IDLE = 4'b0000,
-        INIT_RAM = 4'b0001,
-        SHUFFLE_RAM = 4'b0010,
-        READ_MESSAGE = 4'b0100
+    typedef enum logic [2:0] {
+        IDLE = 3'b000,
+        INIT_RAM = 3'b001,
+        SHUFFLE_RAM = 3'b010,
+        DECRYPT_RAM = 3'b100
     } state_t;
 
     state_t state, next_state;
-    assign state_tap = state;
+    assign modeTap = state;
 
     logic [NUM_DEVICES-1:0] finished;
     logic [NUM_DEVICES-1:0] next_finished;
-
     assign fTap = finished;
+
     ramcontroller controller(
         .clk(clk),
         .reset(reset),
-        .finished(next_finished),
+        .finish_bus(next_finished),
         .mode(state),
-        .ram_out(ram_out),
-        .address(address),
-        .ram_in(ram_in),
-        .write_enable(write_enable),
+        .sIn(sIn),
+        .sAddr(sAddr),
+        .sWren(sWren),
+        .sOut(sOut),
+        .kAddr(kAddr),
+        .kOut(kOut),
+        .aAddr(aAddr),
+        .aIn(aIn),
+        .aWren(aWren),
         .key(key),
         .iTap(iTap),
         .jTap(jTap),
         .siTap(siTap),
         .sjTap(sjTap),
-        .shuffleState(shuffleState)
+        .stateTap(stateTap),
+        .kTap(kTap),
+        .wrenTap(wrenTap)
     );
 
 
@@ -86,11 +105,22 @@ module arcfour
 
             SHUFFLE_RAM: begin
                 if(finished[1])begin
+                    next_state = DECRYPT_RAM;
+                    next_arcfour_finished = 0;
+                end
+                else begin 
+                    next_state = SHUFFLE_RAM;
+                    next_arcfour_finished = 0;
+                end
+            end
+
+            DECRYPT_RAM: begin
+                if(finished[2])begin
                     next_state = IDLE;
                     next_arcfour_finished = 1;
                 end
                 else begin 
-                    next_state = SHUFFLE_RAM;
+                    next_state = DECRYPT_RAM;
                     next_arcfour_finished = 0;
                 end
             end

@@ -3,58 +3,57 @@
 module ramcontroller
     #(
         parameter RAM_WIDTH = 8,
-        parameter NUM_DEVICES = 4,
-        parameter KEY_LENGTH = 3
+        parameter RAM_LENGTH = 8,
+        parameter NUM_DEVICES = 3,
+        parameter KEY_LENGTH = 3,
+        parameter MESSAGE_LOG_LENGTH = 5
     )
     (
         input logic clk,
         input logic reset,
+
         //////////////////////////////////////////Function select
         input logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] key,
-        
-        input logic [3:0] mode,
-        output logic [NUM_DEVICES-1:0] finished,
+        input logic[2:0] mode,
+        output logic [NUM_DEVICES-1:0] finish_bus,
+
         ////////////////////////////////////////RAM IO
-        input logic [RAM_WIDTH - 1 : 0] ram_out,
-        
-        output logic write_enable,
-        output logic [RAM_WIDTH - 1 : 0] ram_in,
-        output logic [RAM_WIDTH - 1 : 0] address,
+        output logic sWren,
+        input logic [RAM_WIDTH - 1 : 0] sOut,
+        output logic [RAM_WIDTH - 1 : 0] sIn,
+        output logic [RAM_WIDTH - 1 : 0] sAddr,
 
+        input logic [RAM_WIDTH-1:0] kOut,
+        output logic [MESSAGE_LOG_LENGTH-1:0] kAddr,
 
-        output logic[7:0]iTap,
+        output logic [RAM_WIDTH-1:0] aIn,
+        output logic [RAM_LENGTH-1:0] aAddr,
+        output logic aWren,
+
+        output logic[7:0]iTap,          //TEST
         output logic[7:0]jTap,
         output logic[7:0]siTap,
         output logic[7:0]sjTap,
-        output logic [2:0] shuffleState
-
-        ////////////////////////////////////MESSAGE ROM BLOCK
-
-
-        ///////////////////////////////////ANSWER RAM BLOCK
-
-
-
+        output logic[7:0]kTap,
+        output logic [7:0] stateTap,
+        output logic wrenTap
     );
 
+
     logic [NUM_DEVICES - 1 : 0] start_bus;
-    logic [NUM_DEVICES - 1 : 0] finish_bus;
-    
-    assign finished = finish_bus;
-
-    logic [NUM_DEVICES-1:0][RAM_WIDTH-1:0] ram_in_bus;
-    logic [NUM_DEVICES-1:0][RAM_WIDTH-1:0] address_bus;
-    logic [NUM_DEVICES - 1 : 0] write_enable_bus;
+    logic [NUM_DEVICES-1:0][RAM_WIDTH-1:0] sInBus;
+    logic [NUM_DEVICES-1:0][RAM_WIDTH-1:0] sAddrBus;
+    logic [NUM_DEVICES - 1 : 0] sWrenBus;
 
 
-    ram_initializer intializer(
+    ram_initializer initializer(
         .clk(clk),
         .reset(reset),
         .start(start_bus[0]),
         .finished(finish_bus[0]),
-        .write_enable(write_enable_bus[0]),
-        .ram_in(ram_in_bus[0]),
-        .address(address_bus[0])
+        .write_enable(sWrenBus[0]),
+        .ram_in(sInBus[0]),
+        .address(sAddrBus[0])
     );
 
 
@@ -63,53 +62,69 @@ module ramcontroller
         .reset(reset),
         .start(start_bus[1]),
         .finished(finish_bus[1]),
-        .ram_out(ram_out),
+        .ram_out(sOut),
         .key(key),
-        .write_enable(write_enable_bus[1]),
-        .ram_in(ram_in_bus[1]),
-        .address(address_bus[1]),
-        .iTap(iTap),
-        .jTap(jTap),
-        .siTap(siTap),
-        .sjTap(sjTap),
-        .stateTap(shuffleState)
+        .write_enable(sWrenBus[1]),
+        .ram_in(sInBus[1]),
+        .address(sAddrBus[1])
     );
 
 
+    decryptor decryptor(
+        .clk(clk),
+        .reset(reset),
+        .start(start_bus[2]),
+        .sOut(sOut),
+        .sAddr(sAddrBus[2]),
+        .sWren(sWrenBus[2]),
+        .sIn(sInBus[2]),
+        .aIn(aIn),
+        .aAddr(aAddr),
+        .aWren(aWren),
+        .kOut(kOut),
+        .kAddr(kAddr),
+        .finished(finish_bus[2]),
+        .iTap(iTap),
+        .jTap(jTap),
+        .kTap(kTap),
+        .siTap(siTap),
+        .sjTap(sjTap),
+        .stateTap(stateTap),
+        .wrenTap(wrenTap)
+    );
 
-
-
-
-
-    logic [2:0] curr_mode;
-    always_ff @(posedge clk) begin
-        curr_mode <= mode;
-    end
 
     always_comb begin
-        case(curr_mode)
+        case(mode)
 
             //Initialize RAM
-            4'b0001: begin   
+            3'b001: begin   
                 start_bus = {{(NUM_DEVICES - 1){1'b0}}, 1'b1};
-                write_enable = write_enable_bus[0];
-                ram_in = ram_in_bus[0];
-                address = address_bus[0];
+                sWren = initializer.write_enable;
+                sIn = initializer.ram_in;
+                sAddr = initializer.address;
             end
 
-            4'b0010: begin
+            3'b010: begin
                 start_bus = {{(NUM_DEVICES - 2){1'b0}}, 1'b1, 1'b0};
-                write_enable = write_enable_bus[1];
-                ram_in = ram_in_bus[1];
-                address = address_bus[1];
+                sWren = shuffler.write_enable;
+                sIn = shuffler.ram_in;
+                sAddr = shuffler.address;
             end
 
+
+            3'b100: begin
+                start_bus = {{(NUM_DEVICES - 3){1'b0}}, 1'b1, 2'b0};
+                sWren = decryptor.sWren;
+                sIn = decryptor.sIn;
+                sAddr = decryptor.sAddr;
+            end
 
             default: begin
                 start_bus = 0;
-                ram_in = 0;
-                address = 0;
-                write_enable = 0;
+                sWren = 0;
+                sAddr = 0;
+                sIn = 0;
             end
 
         endcase

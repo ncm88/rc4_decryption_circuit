@@ -28,7 +28,8 @@ module decryptor
         output logic [7:0] kTap,
         output logic [7:0] stateTap,
         output logic [7:0] siTap,
-        output logic [7:0] sjTap
+        output logic [7:0] sjTap,
+        output logic wrenTap
     );
 
     logic increment_k, start_sig;
@@ -36,6 +37,7 @@ module decryptor
     logic [RAM_LENGTH-1:0] i, j, next_i, next_j;
     logic [MESSAGE_LOG_LENGTH-1:0] k, next_k;
 
+    assign wrenTap = sWren;
 
     typedef enum logic [7:0] { 
         AWAIT_START = 8'b000_0000,
@@ -46,7 +48,7 @@ module decryptor
         SET_SJ = 8'b0101_0010,
         AWAIT_SX = 8'b0110_0000,
         WRITE_ANSWER = 8'b0111_0101,
-        FINISHED = 8'b1000_1100
+        FINISHED = 8'b1000_1000
     } state_t;
 
     state_t state, next_state;
