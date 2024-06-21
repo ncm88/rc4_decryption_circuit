@@ -145,9 +145,9 @@ module ram_shuffler
         if(reset) begin
             state <= AWAIT_START;
             i <= 0;
-            j <= 0;         //si and j lag i by one
+            j <= 0;         
             si <= 0;
-            sj <= 0;        //sj lags i by two
+            sj <= 0;       
             address <= 0;
             ram_in <= 0;
             write_enable <= 0;
@@ -195,7 +195,7 @@ module ram_shuffler
                 next_sj = sj;
                 next_si = ram_out;
                 
-                next_j = j + next_si + key[i % KEY_LENGTH];
+                next_j = j + next_si + key[(KEY_LENGTH-1) - i % KEY_LENGTH];
 
                 next_address = next_j;
                 next_ram_in = 0;
