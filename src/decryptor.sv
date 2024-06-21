@@ -42,7 +42,9 @@ module decryptor
     typedef enum logic [7:0] { 
         AWAIT_START = 8'b000_0000,
         COMPUTE_I = 8'b0001_0000,
+        WAIT_SI = 8'b0111_0000,
         READ_SI = 8'b0010_0000,
+        WAIT_SJ = 8'b1111_0000,
         READ_SJ = 8'b0011_0000,
         SET_SI = 8'b0100_0010,
         SET_SJ = 8'b0101_0010,
@@ -53,21 +55,25 @@ module decryptor
 
     state_t state, next_state;
 
-    assign increment_k = state[0] && (k < MESSAGE_LENGTH-1);
-    assign sWren = state[1];
-    assign aWren = state[2];
-    assign finished = state[3];
 
-    assign next_k = (finished)? 0 : (increment_k? k + 1 : k);
-    assign next_i = (finished)? 0 : (state == COMPUTE_I)? i+1 : i;
-    assign next_j = (finished)? 0 : (state == READ_SI)? next_si + j : j;
+    always_comb begin
+        increment_k = state[0] && (k < MESSAGE_LENGTH-1);
+        sWren = state[1];
+        aWren = state[2];
+        finished = state[3];
 
-    assign next_si = (finished)? 0 : (state == READ_SI)? sOut : si;
-    assign next_sj = (finished)? 0 : (state == READ_SJ)? sOut : sj;
-    
-    assign aIn = (si + sj) ^ kOut;
-    assign aAddr = k;
-    assign kAddr = k;
+        next_k = (finished)? 0 : (increment_k? k + 1 : k);
+        next_i = (finished)? 0 : (state == COMPUTE_I)? i+1 : i;
+
+        next_si = (finished)? 0 : (state == READ_SI)? sOut : si;
+        next_j = (finished)? 0 : (state == READ_SI)? next_si + j : j;
+        
+        next_sj = (finished)? 0 : (state == READ_SJ)? sOut : sj;
+
+        aIn = sAddr;
+        aAddr = k;
+        kAddr = k;
+    end
 
 
     //////////////////////////TEST////////////////////////////
@@ -78,38 +84,56 @@ module decryptor
     assign stateTap = state;
     assign kTap = k;
 
-
+    logic[7:0] address, next_address;
+    assign sAddr = address;
 
     //sAddr and sIn logic
     always_comb begin
         case(state)
             COMPUTE_I: begin
-                sAddr = next_i;
+                next_address = next_i;
                 sIn = 0;
             end 
-            READ_SI: begin
-                sAddr = next_j;
+
+            WAIT_SI: begin
+                next_address = i;
                 sIn = 0;
             end
+
+            READ_SI: begin
+                next_address = next_j;
+                sIn = 0;
+            end
+
+            WAIT_SJ: begin
+                next_address = j;
+                sIn = 0;
+            end
+
             READ_SJ: begin
-                sAddr = i;
+                next_address = i;
                 sIn = 0;
             end
             SET_SI: begin
-                sAddr = i;
+                next_address = j;
                 sIn = sj;
             end
             SET_SJ: begin
-                sAddr = j;
+                next_address = si + sj;
                 sIn = si;
             end
             AWAIT_SX: begin
-                sAddr = si + sj;
+                next_address = si + sj;
+                sIn = 0;
+            end
+
+            WRITE_ANSWER: begin
+                next_address = increment_k? i : 0;
                 sIn = 0;
             end
 
             default: begin
-                sAddr = 0;
+                next_address = 0;
                 sIn = 0;
             end
         endcase
@@ -129,8 +153,10 @@ module decryptor
     always_comb begin
         case(state)
             AWAIT_START: next_state = start_sig? COMPUTE_I : AWAIT_START;
-            COMPUTE_I: next_state = READ_SI;
-            READ_SI: next_state = READ_SJ;
+            COMPUTE_I: next_state = WAIT_SI;
+            WAIT_SI: next_state = READ_SI;
+            READ_SI: next_state = WAIT_SJ;
+            WAIT_SJ: next_state = READ_SJ;
             READ_SJ: next_state = SET_SI;
             SET_SI: next_state = SET_SJ;
             SET_SJ: next_state = AWAIT_SX;
@@ -150,6 +176,7 @@ module decryptor
             j <= 0;
             si <= 0;
             sj <= 0;
+            address <= 0;
         end
         else begin
             state <= next_state;
@@ -158,6 +185,7 @@ module decryptor
             j <= next_j;
             si <= next_si;
             sj <= next_sj;
+            address <= next_address;
         end
     end
 

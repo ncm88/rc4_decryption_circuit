@@ -100,24 +100,24 @@ module ramcontroller
             //Initialize RAM
             3'b001: begin   
                 start_bus = {{(NUM_DEVICES - 1){1'b0}}, 1'b1};
-                sWren = initializer.write_enable;
-                sIn = initializer.ram_in;
-                sAddr = initializer.address;
+                sWren = sWrenBus[0];
+                sIn = sInBus[0];
+                sAddr = sAddrBus[0];
             end
 
             3'b010: begin
                 start_bus = {{(NUM_DEVICES - 2){1'b0}}, 1'b1, 1'b0};
-                sWren = shuffler.write_enable;
-                sIn = shuffler.ram_in;
-                sAddr = shuffler.address;
+                sWren = sWrenBus[1];
+                sIn = sInBus[1];
+                sAddr = sAddrBus[1];
             end
 
 
             3'b100: begin
                 start_bus = {{(NUM_DEVICES - 3){1'b0}}, 1'b1, 2'b0};
-                sWren = decryptor.sWren;
-                sIn = decryptor.sIn;
-                sAddr = decryptor.sAddr;
+                sWren = sWrenBus[2];
+                sIn = sInBus[2];
+                sAddr = sAddrBus[2];
             end
 
             default: begin

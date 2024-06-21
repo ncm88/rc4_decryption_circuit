@@ -20,17 +20,20 @@ module ksa
     assign start = SW[1];
     assign LEDR[0] = finished;
 
-    logic [7:0] ram_in;
-    logic [7:0] ram_out;
-    logic [7:0] address;
-    logic write_enable;
+    logic [7:0] sIn;
+    logic [7:0] sOut;
+    logic [7:0] sAddr;
+    logic sWren;
 
-    logic [2:0] state;
-    logic [1:0] fTap;
+    logic [7:0] aIn;
+    logic [7:0] aAddr;
+    logic aWren;
+
+    logic [7:0] kOut;
+    logic [4:0] kAddr;
     
     
     //TODO: get rid of explicit key stuff
-    
     logic [2:0][7:0] key;
     //assign key = 24'b01001001_00000010_00000000;
 
@@ -51,24 +54,41 @@ module ksa
         .key(key),
         .start_sig(start_sig),
         .arcfour_finished(finished),
-        .ram_out(ram_out),
-        .write_enable(write_enable),
-        .ram_in(ram_in),
-        .address(address),
-        .state_tap(state),
-        .fTap(fTap)
+        .sIn(sIn),
+        .sAddr(sAddr),
+        .sWren(sWren),
+        .sOut(sOut),
+        .kAddr(kAddr),
+        .kOut(kOut),
+        .aAddr(aAddr),
+        .aIn(aIn),
+        .aWren(aWren)
     );
 
 
     //TODO: integrate ramcore into arcfour module
     //read enable is by default high
     ramcore S (
-        .address(address),
+        .address(sAddr),
         .clock(clk),
-        .data(ram_in),
-        .wren(write_enable),
-        .q(ram_out)
+        .data(sIn),
+        .wren(sWren),
+        .q(sOut)
     );
 
+
+    ramcore A(
+        .address(aAddr),
+        .clock(clk),
+        .data(aIn),
+        .wren(aWren)
+    );
+
+
+    romcore K(
+        .address(kAddr),
+        .clock(clk),
+        .q(kOut)
+    );
 
 endmodule
