@@ -93,11 +93,17 @@ module ramcontroller
         .wrenTap(wrenTap)
     );
 
+/*
+    logic[2:0] curr_mode;
 
+    always @(posedge clk) begin
+        curr_mode <= mode;
+    end
+
+*/
     always_comb begin
         case(mode)
 
-            //Initialize RAM
             3'b001: begin   
                 start_bus = {{(NUM_DEVICES - 1){1'b0}}, 1'b1};
                 sWren = sWrenBus[0];
@@ -112,14 +118,14 @@ module ramcontroller
                 sAddr = sAddrBus[1];
             end
 
-
+            
             3'b100: begin
                 start_bus = {{(NUM_DEVICES - 3){1'b0}}, 1'b1, 2'b0};
                 sWren = sWrenBus[2];
                 sIn = sInBus[2];
                 sAddr = sAddrBus[2];
             end
-
+            
             default: begin
                 start_bus = 0;
                 sWren = 0;

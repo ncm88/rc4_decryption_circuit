@@ -42,9 +42,7 @@ module decryptor
     typedef enum logic [7:0] { 
         AWAIT_START = 8'b000_0000,
         COMPUTE_I = 8'b0001_0000,
-        WAIT_SI = 8'b0111_0000,
         READ_SI = 8'b0010_0000,
-        WAIT_SJ = 8'b1111_0000,
         READ_SJ = 8'b0011_0000,
         SET_SI = 8'b0100_0010,
         SET_SJ = 8'b0101_0010,
@@ -70,7 +68,7 @@ module decryptor
         
         next_sj = (finished)? 0 : (state == READ_SJ)? sOut : sj;
 
-        aIn = sAddr;
+        aIn = sOut ^ kOut;
         aAddr = k;
         kAddr = k;
     end
@@ -84,56 +82,38 @@ module decryptor
     assign stateTap = state;
     assign kTap = k;
 
-    logic[7:0] address, next_address;
-    assign sAddr = address;
+
 
     //sAddr and sIn logic
     always_comb begin
         case(state)
             COMPUTE_I: begin
-                next_address = next_i;
+                sAddr = next_i;
                 sIn = 0;
             end 
-
-            WAIT_SI: begin
-                next_address = i;
-                sIn = 0;
-            end
-
             READ_SI: begin
-                next_address = next_j;
+                sAddr = next_j;
                 sIn = 0;
             end
-
-            WAIT_SJ: begin
-                next_address = j;
-                sIn = 0;
-            end
-
             READ_SJ: begin
-                next_address = i;
+                sAddr = i;
                 sIn = 0;
             end
             SET_SI: begin
-                next_address = j;
+                sAddr = i;
                 sIn = sj;
             end
             SET_SJ: begin
-                next_address = si + sj;
+                sAddr = j;
                 sIn = si;
             end
             AWAIT_SX: begin
-                next_address = si + sj;
-                sIn = 0;
-            end
-
-            WRITE_ANSWER: begin
-                next_address = increment_k? i : 0;
+                sAddr = si + sj;
                 sIn = 0;
             end
 
             default: begin
-                next_address = 0;
+                sAddr = 0;
                 sIn = 0;
             end
         endcase
@@ -153,16 +133,14 @@ module decryptor
     always_comb begin
         case(state)
             AWAIT_START: next_state = start_sig? COMPUTE_I : AWAIT_START;
-            COMPUTE_I: next_state = WAIT_SI;
-            WAIT_SI: next_state = READ_SI;
-            READ_SI: next_state = WAIT_SJ;
-            WAIT_SJ: next_state = READ_SJ;
+            COMPUTE_I: next_state = READ_SI;
+            READ_SI: next_state = READ_SJ;
             READ_SJ: next_state = SET_SI;
             SET_SI: next_state = SET_SJ;
             SET_SJ: next_state = AWAIT_SX;
             AWAIT_SX: next_state = WRITE_ANSWER;
             WRITE_ANSWER: next_state = increment_k? COMPUTE_I : FINISHED;
-            FINISHED: next_state = start_sig? COMPUTE_I : FINISHED;
+            FINISHED: next_state = AWAIT_START;
             default: next_state = AWAIT_START;
         endcase
     end
@@ -176,7 +154,6 @@ module decryptor
             j <= 0;
             si <= 0;
             sj <= 0;
-            address <= 0;
         end
         else begin
             state <= next_state;
@@ -185,7 +162,6 @@ module decryptor
             j <= next_j;
             si <= next_si;
             sj <= next_sj;
-            address <= next_address;
         end
     end
 
