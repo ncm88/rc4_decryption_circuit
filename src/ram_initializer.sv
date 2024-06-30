@@ -32,7 +32,7 @@ module ram_initializer
 
     logic start_sig;
 
-    trap_edge trapper(
+    edge_detector detector(
         .clk(clk),
         .in(start),
         .out(start_sig)

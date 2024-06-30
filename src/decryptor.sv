@@ -29,7 +29,8 @@ module decryptor
         output logic [7:0] stateTap,
         output logic [7:0] siTap,
         output logic [7:0] sjTap,
-        output logic wrenTap
+        output logic wrenTap,
+        output logic success
     );
 
     logic increment_k, start_sig;
@@ -40,15 +41,16 @@ module decryptor
     assign wrenTap = sWren;
 
     typedef enum logic [7:0] { 
-        AWAIT_START = 8'b000_0000,
-        COMPUTE_I = 8'b0001_0000,
-        READ_SI = 8'b0010_0000,
-        READ_SJ = 8'b0011_0000,
-        SET_SI = 8'b0100_0010,
-        SET_SJ = 8'b0101_0010,
-        AWAIT_SX = 8'b0110_0000,
-        WRITE_ANSWER = 8'b0111_0101,
-        FINISHED = 8'b1000_1000
+        AWAIT_START = 8'b000_00000,
+        COMPUTE_I = 8'b0001_00000,
+        READ_SI = 8'b0010_00000,
+        READ_SJ = 8'b0011_00000,
+        SET_SI = 8'b0100_00010,
+        SET_SJ = 8'b0101_00010,
+        AWAIT_SX = 8'b0110_00000,
+        WRITE_ANSWER = 8'b0111_00101,
+        SUCCESS = 8'b1000_11000,
+        FAIL = 8'b1001_01000
     } state_t;
 
     state_t state, next_state;
@@ -59,6 +61,7 @@ module decryptor
         sWren = state[1];
         aWren = state[2];
         finished = state[3];
+        success = state[4];
 
         next_k = (finished)? 0 : (increment_k? k + 1 : k);
         next_i = (finished)? 0 : (state == COMPUTE_I)? i+1 : i;
@@ -122,7 +125,7 @@ module decryptor
 
 
 
-    trap_edge start_trapper(
+    edge_detector start_trapper(
         .clk(clk),
         .in(start),
         .out(start_sig)
@@ -139,8 +142,9 @@ module decryptor
             SET_SI: next_state = SET_SJ;
             SET_SJ: next_state = AWAIT_SX;
             AWAIT_SX: next_state = WRITE_ANSWER;
-            WRITE_ANSWER: next_state = increment_k? COMPUTE_I : FINISHED;
-            FINISHED: next_state = AWAIT_START;
+            WRITE_ANSWER: next_state = (((aIn < 97) || (aIn > 122)) && (aIn != 32))? FAIL : (increment_k? COMPUTE_I : SUCCESS);
+            SUCCESS: next_state = AWAIT_START;
+            FAIL: next_state = AWAIT_START;
             default: next_state = AWAIT_START;
         endcase
     end

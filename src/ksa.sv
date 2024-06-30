@@ -13,12 +13,12 @@ module ksa
         input [6:0] HEX5
     );
 
-    logic clk, start, reset, finished;
+    logic clk, start, reset;
     logic reset_sig;
     assign clk = CLOCK_50;
     assign reset = KEY[0]; //keys are active low
     assign start = KEY[1];
-    assign LEDR[0] = finished;
+
 
     logic [7:0] sIn;
     logic [7:0] sOut;
@@ -38,11 +38,33 @@ module ksa
     assign keySel = 1;
     assign switchKey = {14'b0, SW[9:0]};
     
-    trap_edge reset_trapper(
+    edge_detector reset_detector(
         .clk(clk),
         .in(reset),
         .out(reset_sig)
     );
+
+    logic clear_start;
+    edge_detector start_detector(
+        .clk(clk),
+        .in(start),
+        .out(clear_start)
+    );
+
+
+    logic success, successOut;
+    logic finished;
+
+    trap_edge trapper(
+        .in(success),
+        .clk(clk),
+        .reset(clear_start), 
+        .out(successOut)
+    );
+
+    assign LEDR[0] = finished;
+    assign LEDR[1] = successOut;
+
 
 
     arcfour RC(
@@ -60,7 +82,8 @@ module ksa
         .aAddr(aAddr),
         .aIn(aIn),
         .aWren(aWren),
-        .key_select(keySel)
+        .key_select(keySel),
+        .success(success)
     );
 
 

@@ -1,6 +1,6 @@
 module key_generator
     #(
-        parameter KEY_UPPER = 24'h000001,       //operates over [KEY_LOWER, KEY_UPPER] inclusive
+        parameter KEY_UPPER = 24'hffffff,       //operates over [KEY_LOWER, KEY_UPPER] inclusive
         parameter KEY_LOWER = 24'h000000
     )
     (
@@ -27,7 +27,7 @@ module key_generator
     assign terminated = state[1];
 
     logic start_sig;
-    trap_edge start_trapper(
+    edge_detector start_detector(
         .clk(clk),
         .in(start),
         .out(start_sig)

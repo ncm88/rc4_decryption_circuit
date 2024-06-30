@@ -34,7 +34,7 @@ module arcfour
         output logic [RAM_WIDTH-1:0] aIn,
         output logic [RAM_LENGTH-1:0] aAddr,
         output logic aWren,
-
+        output logic success,
         /////////////////////////////////TEST
         output logic[7:0]iTap,
         output logic[7:0]jTap,
@@ -62,7 +62,7 @@ module arcfour
     assign modeTap = state;
 
     logic start_sig;
-    trap_edge trapper(
+    edge_detector detector(
         .clk(clk),
         .in(start),
         .out(start_sig)
@@ -141,7 +141,8 @@ module arcfour
         .sjTap(sjTap),
         .stateTap(stateTap),
         .kTap(kTap),
-        .wrenTap(wrenTap)
+        .wrenTap(wrenTap),
+        .success(success)
     );
 
 

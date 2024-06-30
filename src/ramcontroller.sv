@@ -29,6 +29,7 @@ module ramcontroller
         output logic [RAM_WIDTH-1:0] aIn,
         output logic [RAM_LENGTH-1:0] aAddr,
         output logic aWren,
+        output logic success,
 
         output logic[7:0]iTap,          //TEST
         output logic[7:0]jTap,
@@ -90,7 +91,8 @@ module ramcontroller
         .siTap(siTap),
         .sjTap(sjTap),
         .stateTap(stateTap),
-        .wrenTap(wrenTap)
+        .wrenTap(wrenTap),
+        .success(success)
     );
 
 /*

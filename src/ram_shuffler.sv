@@ -59,7 +59,7 @@ module ram_shuffler
     state_t state, next_state;
     logic start_sig;
 
-    trap_edge trapper(
+    edge_detector detector(
         .clk(clk),
         .in(start),
         .out(start_sig)
