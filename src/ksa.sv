@@ -35,7 +35,15 @@ module ksa
     
     logic [2:0][7:0] switchKey;
     logic keySel;
-    assign keySel = 1;
+    
+    key_toggle toggler(
+        .in(KEY[2]),
+        .clk(clk),
+        .reset(reset_sig),
+        .out(keySel)
+    );
+
+    //TODO: figure out arcfour start/reset signal characteristics
     assign switchKey = {14'b0, SW[9:0]};
     
     edge_detector reset_detector(
@@ -51,7 +59,6 @@ module ksa
         .out(clear_start)
     );
 
-
     logic success, successOut;
     logic finished;
 
@@ -64,7 +71,7 @@ module ksa
 
     assign LEDR[0] = finished;
     assign LEDR[1] = successOut;
-
+    assign LEDR[2] = keySel;
 
 
     arcfour RC(

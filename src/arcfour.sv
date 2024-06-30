@@ -86,11 +86,10 @@ module arcfour
     logic key_finish, key_terminate;
     
     logic decryption_success;
-    assign decryption_success = 0;  //GET RID OF THIS
 
     key_generator keyGen(
         .clk(clk),
-        .reset(reset),
+        .reset(reset || start_sig),
         .start(keyStart),
         .key(generator_key),
         .finished(key_finish),
@@ -142,10 +141,13 @@ module arcfour
         .stateTap(stateTap),
         .kTap(kTap),
         .wrenTap(wrenTap),
-        .success(success)
+        .success(decryption_success)
     );
-
-
+    ///TODO: GET SUCCESS TRIGGER WORKING
+    always_ff @(posedge clk) begin 
+        if(reset) success <= 0;
+        else success <= decryption_success;
+    end
 
     //State transition logic
     always_comb begin
@@ -161,7 +163,7 @@ module arcfour
 
             SHUFFLE_RAM: next_state = finished[1]? DECRYPT_RAM : SHUFFLE_RAM;
 
-            DECRYPT_RAM: next_state = finished[2]? ((termination_flag || decryption_success)? ARCFOUR_TERMINATE : ARCFOUR_FINISH) : DECRYPT_RAM;
+            DECRYPT_RAM: next_state = finished[2]? ((termination_flag || success)? ARCFOUR_TERMINATE : ARCFOUR_FINISH) : DECRYPT_RAM;
 
             ARCFOUR_FINISH: next_state = GET_KEY;
 
