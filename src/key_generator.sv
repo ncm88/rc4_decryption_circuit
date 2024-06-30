@@ -1,6 +1,6 @@
 module key_generator
     #(
-        parameter KEY_UPPER = 24'h000002,       //operates over [KEY_LOWER, KEY_UPPER] inclusive
+        parameter KEY_UPPER = 24'h000001,       //operates over [KEY_LOWER, KEY_UPPER] inclusive
         parameter KEY_LOWER = 24'h000000
     )
     (
@@ -16,7 +16,7 @@ module key_generator
         AWAIT_START = 5'b000_00,
         RUNNING = 5'b001_00,
         FINISHED = 5'b010_01,
-        TERMINATED = 5'b011_10,
+        TERMINATED = 5'b011_11,
         AWAIT_START_POST_FINISH = 5'b100_00
     } state_t;
     state_t state, next_state;

@@ -12,6 +12,8 @@ module arcfour_tb();
     logic aWren;
 
     logic arcfour_finished;
+    logic arcfour_terminated;
+
     logic clk;
     logic [7:0] state;
     logic start;
@@ -29,15 +31,24 @@ module arcfour_tb();
     logic[7:0]sjTap;
     logic[7:0]kTap;
     logic [2:0] fTap;
-    logic [2:0] modeTap;
+    logic [5:0] modeTap;
     logic wrenTap;
+    logic [2:0][7:0] keyTap;
+
+
+    logic key_select;
+    assign key_select = 1'b0;
+
 
     arcfour RC(
         .clk(clk),
         .reset(reset),
-        .key(key),
-        .start_sig(start),
+        .switch_key(key),
+        .start(start),
         .arcfour_finished(arcfour_finished),
+        .arcfour_terminated(arcfour_terminated),
+        .key_select(key_select),
+        .keyTap(keyTap),
 
         .sOut(sOut),
         .sWren(sWren),
@@ -77,23 +88,12 @@ module arcfour_tb();
         reset = 0;
         #7
         start = 1;
-        #3000
-        start = 0;
-        #60
-        start = 1;
-        #100
-        start = 0;
-        #12000
-        start = 1;
-        #5000
-        start = 0;
-        #1000
-        start = 1;
+
     end
 
 
     initial begin
-        #25000
+        #55000
         $finish;
     end
 

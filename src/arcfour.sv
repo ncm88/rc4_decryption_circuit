@@ -1,3 +1,7 @@
+//TODO: 1) test; 2) add success transition logic
+
+
+
 module arcfour
     #(
         parameter RAM_WIDTH = 8,
@@ -9,10 +13,12 @@ module arcfour
     (
         input logic clk,
         input logic reset,
-        input logic start_sig,
+        input logic start,
+        input logic key_select,
 
-        input logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] key,
+        input logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] switch_key,
         output logic arcfour_finished,
+        output logic arcfour_terminated,
 
         /////////////////////////////RAM-S
         output logic sWren,
@@ -37,25 +43,82 @@ module arcfour
         output logic [7:0] stateTap,
         output logic [7:0] kTap,
         output logic [2:0] fTap,
-        output logic [2:0] modeTap,
-        output logic wrenTap
+        output logic [5:0] modeTap,
+        output logic wrenTap,
+        output logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] keyTap
     );
 
-    logic next_arcfour_finished;
 
-    typedef enum logic [2:0] {
-        IDLE = 3'b000,
-        INIT_RAM = 3'b001,
-        SHUFFLE_RAM = 3'b010,
-        DECRYPT_RAM = 3'b100
+    typedef enum logic [5:0] {
+        IDLE = 6'b000_000,
+        INIT_RAM = 6'b001_000,
+        SHUFFLE_RAM = 6'b010_000,
+        DECRYPT_RAM = 6'b011_000,
+        GET_KEY = 6'b100_001,
+        ARCFOUR_FINISH = 6'b101_010,
+        ARCFOUR_TERMINATE = 6'b110_110
     } state_t;
-
     state_t state, next_state;
     assign modeTap = state;
+
+    logic start_sig;
+    trap_edge trapper(
+        .clk(clk),
+        .in(start),
+        .out(start_sig)
+    );
+
+
+    logic keyStart;
+    assign keyStart = state[0];
+    assign arcfour_finished = state[1];
+    assign arcfour_terminated = state[2];
+
 
     logic [NUM_DEVICES-1:0] finished;
     logic [NUM_DEVICES-1:0] next_finished;
     assign fTap = finished;
+
+
+    logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] key, next_key, generator_key;
+    assign keyTap = key;
+
+    logic key_finish, key_terminate;
+    
+    logic decryption_success;
+    assign decryption_success = 0;  //GET RID OF THIS
+
+    key_generator keyGen(
+        .clk(clk),
+        .reset(reset),
+        .start(keyStart),
+        .key(generator_key),
+        .finished(key_finish),
+        .terminated(key_terminate)
+    );
+    
+    logic termination_flag, next_termination_flag;
+    logic key_sel, next_key_sel;
+
+    always_comb begin
+        next_key_sel = (state == IDLE)? key_select : key_sel;
+        next_key = (state == GET_KEY)? (key_sel? switch_key : generator_key) : key;
+        next_termination_flag = (state == GET_KEY)? (key_sel? 1 : key_terminate) : termination_flag;
+    end
+
+    always_ff @(posedge clk) begin
+        if(reset)begin
+            key <= 0;
+            termination_flag <= 0;
+            key_sel <= 0;
+        end
+        else begin
+            key <= next_key;
+            termination_flag <= next_termination_flag;
+            key_sel <= next_key_sel;
+        end
+    end
+
 
     ramcontroller controller(
         .clk(clk),
@@ -86,49 +149,24 @@ module arcfour
     //State transition logic
     always_comb begin
         case(state)
-            IDLE: begin
-                if(start_sig) begin
-                    next_state = INIT_RAM;
-                    next_arcfour_finished = 0;
-                end
-                else begin
-                    next_state = IDLE;
-                    next_arcfour_finished = arcfour_finished;
-                end
+            IDLE: next_state = start_sig? GET_KEY : IDLE;
+
+            GET_KEY: begin
+                if(key_sel) next_state = INIT_RAM;
+                else next_state = key_finish? INIT_RAM : GET_KEY;
             end
 
-            INIT_RAM: begin
-                if(finished[0]) next_state = SHUFFLE_RAM;
-                else next_state = INIT_RAM;
-                next_arcfour_finished = 0;
-            end
+            INIT_RAM: next_state = finished[0]? SHUFFLE_RAM : INIT_RAM;
 
-            SHUFFLE_RAM: begin
-                if(finished[1])begin
-                    next_state = DECRYPT_RAM;
-                    next_arcfour_finished = 0;
-                end
-                else begin 
-                    next_state = SHUFFLE_RAM;
-                    next_arcfour_finished = 0;
-                end
-            end
+            SHUFFLE_RAM: next_state = finished[1]? DECRYPT_RAM : SHUFFLE_RAM;
 
-            DECRYPT_RAM: begin
-                if(finished[2])begin
-                    next_state = IDLE;
-                    next_arcfour_finished = 1;
-                end
-                else begin 
-                    next_state = DECRYPT_RAM;
-                    next_arcfour_finished = 0;
-                end
-            end
+            DECRYPT_RAM: next_state = finished[2]? ((termination_flag || decryption_success)? ARCFOUR_TERMINATE : ARCFOUR_FINISH) : DECRYPT_RAM;
 
-            default: begin
-                next_state = IDLE;
-                next_arcfour_finished = 0;
-            end
+            ARCFOUR_FINISH: next_state = GET_KEY;
+
+            ARCFOUR_TERMINATE: next_state = IDLE;
+
+            default: next_state = IDLE;
         endcase
     end
 
@@ -137,11 +175,9 @@ module arcfour
         if(reset)begin
             state <= IDLE;
             finished <= 0;
-            arcfour_finished <= 0;
         end else begin
             state <= next_state;
             finished <= next_finished;
-            arcfour_finished <= next_arcfour_finished;
         end
     end
 

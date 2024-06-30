@@ -14,7 +14,7 @@ module ksa
     );
 
     logic clk, start, reset, finished;
-    logic start_sig, reset_sig;
+    logic reset_sig;
     assign clk = CLOCK_50;
     assign reset = KEY[0]; //keys are active low
     assign start = KEY[1];
@@ -33,18 +33,10 @@ module ksa
     logic [4:0] kAddr;
     
     
-    //TODO: get rid of explicit key stuff
     logic [2:0][7:0] switchKey;
-    //assign key = 24'b00000000_00000010_01001001;
-
+    logic keySel;
+    assign keySel = 1;
     assign switchKey = {14'b0, SW[9:0]};
-
-
-    trap_edge start_trapper(
-        .clk(clk),
-        .in(start),
-        .out(start_sig)
-    );
     
     trap_edge reset_trapper(
         .clk(clk),
@@ -56,8 +48,8 @@ module ksa
     arcfour RC(
         .clk(clk),
         .reset(reset_sig),
-        .key(switchKey),
-        .start_sig(start_sig),
+        .switch_key(switchKey),
+        .start(start),
         .arcfour_finished(finished),
         .sIn(sIn),
         .sAddr(sAddr),
@@ -67,7 +59,8 @@ module ksa
         .kOut(kOut),
         .aAddr(aAddr),
         .aIn(aIn),
-        .aWren(aWren)
+        .aWren(aWren),
+        .key_select(keySel)
     );
 
 

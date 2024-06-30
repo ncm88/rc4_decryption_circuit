@@ -14,7 +14,7 @@ module ramcontroller
 
         //////////////////////////////////////////Function select
         input logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] key,
-        input logic[2:0] mode,
+        input logic[5:0] mode,
         output logic [NUM_DEVICES-1:0] finish_bus,
 
         ////////////////////////////////////////RAM IO
@@ -104,14 +104,14 @@ module ramcontroller
     always_comb begin
         case(mode)
 
-            3'b001: begin   
+            6'b001_000: begin   
                 start_bus = {{(NUM_DEVICES - 1){1'b0}}, 1'b1};
                 sWren = sWrenBus[0];
                 sIn = sInBus[0];
                 sAddr = sAddrBus[0];
             end
 
-            3'b010: begin
+            6'b010_000: begin
                 start_bus = {{(NUM_DEVICES - 2){1'b0}}, 1'b1, 1'b0};
                 sWren = sWrenBus[1];
                 sIn = sInBus[1];
@@ -119,14 +119,14 @@ module ramcontroller
             end
 
             
-            3'b100: begin
+            6'b011_000: begin
                 start_bus = {{(NUM_DEVICES - 3){1'b0}}, 1'b1, 2'b0};
                 sWren = sWrenBus[2];
                 sIn = sInBus[2];
                 sAddr = sAddrBus[2];
             end
             
-            default: begin
+            default: begin      //For IDLE/Key acquisition states
                 start_bus = 0;
                 sWren = 0;
                 sAddr = 0;
