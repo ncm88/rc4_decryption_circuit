@@ -16,7 +16,7 @@ module decryptor
         output logic sWren,
 
         output logic [RAM_WIDTH-1:0] aIn,
-        output logic [RAM_LENGTH-1:0] aAddr,
+        output logic [MESSAGE_LOG_LENGTH-1:0] aAddr,
         output logic aWren,
 
         input logic [RAM_WIDTH-1:0] kOut,

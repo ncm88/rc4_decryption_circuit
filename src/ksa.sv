@@ -4,12 +4,13 @@
 `default_nettype none
 module ksa
     #(
-        parameter NUM_CORES = 1,
+        parameter NUM_CORES = 55,
         parameter MESSAGE_LENGTH = 32,
         parameter MESSAGE_LOG_LENGTH = 5,
         parameter KEY_LENGTH = 3,    //Three byte key assumed by default
         parameter RAM_WIDTH = 8,
-        parameter RAM_LENGTH = 8
+        parameter RAM_LENGTH = 8,
+        parameter KEY_MAX = 24'hffffffff
     )
     (
         input CLOCK_50,
@@ -68,10 +69,10 @@ module ksa
     );
 
     logic success, successOut;
-    logic finished, killSignal;
+    logic finished;
 
     trap_edge trapper(
-        .in(success),
+        .in(next_killSignal),
         .clk(clk),
         .reset(clear_start), 
         .out(successOut)
@@ -82,56 +83,89 @@ module ksa
     assign LEDR[2] = keySel;
 
 
-    arcfour #(
-        .RAM_WIDTH(RAM_WIDTH),
-        .RAM_LENGTH(RAM_LENGTH),
-        .KEY_LENGTH(KEY_LENGTH),
-        .KEY_UPPER(24'hffffff),
-        .KEY_LOWER(0),
-        .MESSAGE_LENGTH(MESSAGE_LENGTH),
-        .MESSAGE_LOG_LENGTH(MESSAGE_LOG_LENGTH)
-    ) RC
-    (
-        .clk(clk),
-        .reset(reset_sig),
-        .switch_key(switchKey),
-        .start(start),
-        .arcfour_finished(finished),
-        .sIn(sIn),
-        .sAddr(sAddr),
-        .sWren(sWren),
-        .sOut(sOut),
-        .kAddr(kAddr),
-        .kOut(kOut),
-        .aAddr(aAddr),
-        .aIn(aIn),
-        .aWren(aWren),
-        .key_select(keySel),
-        .success(success)
-    );
+    ///////////////////////////////////////////////////////////PARALLELIZATION BLOCK///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    logic [NUM_CORES-1:0] s_wren_bus;                       //Bussin'
+    logic [NUM_CORES-1:0][RAM_LENGTH-1:0] s_addr_bus;
+    logic [NUM_CORES-1:0][RAM_WIDTH-1:0] s_in_bus;
+    logic [NUM_CORES-1:0][RAM_WIDTH-1:0] s_out_bus;
+
+    logic [NUM_CORES-1:0] a_wren_bus;
+    logic [NUM_CORES-1:0][MESSAGE_LOG_LENGTH-1:0] a_addr_bus;
+    logic [NUM_CORES-1:0][RAM_WIDTH-1:0] a_in_bus;
+
+    logic [NUM_CORES-1:0][MESSAGE_LOG_LENGTH-1:0] k_addr_bus;
+    logic [NUM_CORES-1:0][RAM_WIDTH-1:0] k_out_bus;
+
+    logic [NUM_CORES-1:0] success_bus;
+    
+
+    logic killSignal, next_killSignal;
+    assign next_killSignal = |success_bus;
+    always_ff @(posedge clk) begin
+        if(reset_sig) killSignal <= 1;
+        else killSignal <= next_killSignal;
+    end
 
 
-    ramcore S (
-        .address(sAddr),
-        .clock(clk),
-        .data(sIn),
-        .wren(sWren),
-        .q(sOut)
-    );
+    localparam k = KEY_MAX/NUM_CORES;
+
+    genvar i;
+    generate
+        for(i = 0; i < NUM_CORES; i = i + 1) begin : core_generate
+            arcfour #(
+                .RAM_WIDTH(RAM_WIDTH),
+                .RAM_LENGTH(RAM_LENGTH),
+                .KEY_LENGTH(KEY_LENGTH),
+                .KEY_UPPER(k * (i+1) - 1),
+                .KEY_LOWER(k * i),
+                .MESSAGE_LENGTH(MESSAGE_LENGTH),
+                .MESSAGE_LOG_LENGTH(MESSAGE_LOG_LENGTH)
+            ) RC
+            (
+                .clk(clk),
+                .reset(killSignal),
+                .switch_key(switchKey),
+                .start(start),
+                .sIn(s_in_bus[i]),
+                .sAddr(s_addr_bus[i]),
+                .sWren(s_wren_bus[i]),
+                .sOut(s_out_bus[i]),
+                .kAddr(k_addr_bus[i]),
+                .kOut(k_out_bus[i]),
+                .aAddr(a_addr_bus[i]),
+                .aIn(a_in_bus[i]),
+                .aWren(a_wren_bus[i]),
+                .key_select(keySel),
+                .success(success_bus[i])
+            );
 
 
-    ramcore A(
-        .address(aAddr),
-        .clock(clk),
-        .data(aIn),
-        .wren(aWren)
-    );
+            ramcore S (
+                .address(s_addr_bus[i]),
+                .clock(clk),
+                .data(s_in_bus[i]),
+                .wren(s_wren_bus[i]),
+                .q(s_out_bus[i])
+            );
 
 
-    romcore K(
-        .address(kAddr),
-        .clock(clk),
-        .q(kOut)
-    );
+            ramcore A(
+                .address(a_addr_bus[i]),
+                .clock(clk),
+                .data(a_in_bus[i]),
+                .wren(a_wren_bus[i])
+            );
+
+
+            romcore K(
+                .address(k_addr_bus[i]),
+                .clock(clk),
+                .q(k_out_bus[i])
+            );
+
+        end
+    endgenerate
+
 
 endmodule
