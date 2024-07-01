@@ -1,14 +1,13 @@
-//TODO: 1) test; 2) add success transition logic
-
-
-
 module arcfour
     #(
         parameter RAM_WIDTH = 8,
         parameter RAM_LENGTH = 8,
         parameter NUM_DEVICES = 3,
-        parameter KEY_LENGTH = 3,
-        parameter MESSAGE_LOG_LENGTH = 5
+        parameter KEY_LENGTH,
+        parameter MESSAGE_LENGTH,
+        parameter MESSAGE_LOG_LENGTH,
+        parameter KEY_UPPER,
+        parameter KEY_LOWER
     )
     (
         input logic clk,
@@ -87,7 +86,7 @@ module arcfour
     
     logic decryption_success;
 
-    key_generator keyGen(
+    key_generator #(.KEY_UPPER(KEY_UPPER), .KEY_LOWER(KEY_LOWER)) keyGen(
         .clk(clk),
         .reset(reset || start_sig),
         .start(keyStart),
@@ -119,7 +118,12 @@ module arcfour
     end
 
 
-    ramcontroller controller(
+    ramcontroller #(
+        .MESSAGE_LENGTH(MESSAGE_LENGTH),
+        .MESSAGE_LOG_LENGTH(MESSAGE_LOG_LENGTH),
+        .KEY_LENGTH(KEY_LENGTH)
+    ) controller
+    (
         .clk(clk),
         .reset(reset),
         .finish_bus(next_finished),
@@ -143,7 +147,7 @@ module arcfour
         .wrenTap(wrenTap),
         .success(decryption_success)
     );
-    ///TODO: GET SUCCESS TRIGGER WORKING
+
     always_ff @(posedge clk) begin 
         if(reset) success <= 0;
         else success <= decryption_success;

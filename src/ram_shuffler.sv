@@ -17,8 +17,7 @@ module ram_shuffler
         parameter RAM_LENGTH = 8,
         parameter KEY_LENGTH = 3,       //Number of bytes in our key
         parameter START_INDEX = 0,
-        parameter END_INDEX = 255,
-        parameter USE_TAPS = 0
+        parameter END_INDEX = 255
     )
     (
         input logic clk,

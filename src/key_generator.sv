@@ -1,7 +1,7 @@
 module key_generator
     #(
-        parameter KEY_UPPER = 24'hffffff,       //operates over [KEY_LOWER, KEY_UPPER] inclusive
-        parameter KEY_LOWER = 24'h000000
+        parameter KEY_UPPER,       //operates over [KEY_LOWER, KEY_UPPER] inclusive
+        parameter KEY_LOWER
     )
     (
         input logic clk,

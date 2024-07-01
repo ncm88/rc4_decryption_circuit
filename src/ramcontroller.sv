@@ -5,8 +5,9 @@ module ramcontroller
         parameter RAM_WIDTH = 8,
         parameter RAM_LENGTH = 8,
         parameter NUM_DEVICES = 3,
-        parameter KEY_LENGTH = 3,
-        parameter MESSAGE_LOG_LENGTH = 5
+        parameter KEY_LENGTH,
+        parameter MESSAGE_LENGTH,
+        parameter MESSAGE_LOG_LENGTH
     )
     (
         input logic clk,
@@ -71,7 +72,11 @@ module ramcontroller
     );
 
 
-    decryptor decryptor(
+    decryptor #(
+        .MESSAGE_LENGTH(MESSAGE_LENGTH),
+        .MESSAGE_LOG_LENGTH(MESSAGE_LOG_LENGTH)
+    ) decryptor
+    (
         .clk(clk),
         .reset(reset),
         .start(start_bus[2]),

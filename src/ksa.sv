@@ -1,5 +1,15 @@
+//TODO: multicore and lint
+//TODO: fix hardcoded max key size of 24 bits
+
+
 `default_nettype none
 module ksa
+    #(
+        parameter NUM_CORES = 1,
+        parameter MESSAGE_LENGTH = 32,
+        parameter MESSAGE_LOG_LENGTH = 5,
+        parameter KEY_LENGTH = 3    //Three byte key assumed by default
+    )
     (
         input CLOCK_50,
         input [3:0] KEY,
@@ -74,7 +84,14 @@ module ksa
     assign LEDR[2] = keySel;
 
 
-    arcfour RC(
+    arcfour #(
+        .KEY_LENGTH(KEY_LENGTH),
+        .KEY_UPPER(24'hffffff),
+        .KEY_LOWER(0),
+        .MESSAGE_LENGTH(MESSAGE_LENGTH),
+        .MESSAGE_LOG_LENGTH(MESSAGE_LOG_LENGTH)
+    ) RC
+    (
         .clk(clk),
         .reset(reset_sig),
         .switch_key(switchKey),
@@ -94,8 +111,6 @@ module ksa
     );
 
 
-    //TODO: integrate ramcore into arcfour module
-    //read enable is by default high
     ramcore S (
         .address(sAddr),
         .clock(clk),

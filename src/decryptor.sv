@@ -2,8 +2,8 @@ module decryptor
     #(
         parameter RAM_WIDTH = 8,
         parameter RAM_LENGTH = 8,
-        parameter MESSAGE_LENGTH = 32,
-        parameter MESSAGE_LOG_LENGTH = 5
+        parameter MESSAGE_LENGTH,
+        parameter MESSAGE_LOG_LENGTH
     )
     (
         input logic clk,
