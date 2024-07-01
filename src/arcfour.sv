@@ -1,7 +1,7 @@
 module arcfour
     #(
-        parameter RAM_WIDTH = 8,
-        parameter RAM_LENGTH = 8,
+        parameter RAM_WIDTH,
+        parameter RAM_LENGTH,
         parameter NUM_DEVICES = 3,
         parameter KEY_LENGTH,
         parameter MESSAGE_LENGTH,
@@ -57,6 +57,7 @@ module arcfour
         ARCFOUR_FINISH = 6'b101_010,
         ARCFOUR_TERMINATE = 6'b110_110
     } state_t;
+    
     state_t state, next_state;
     assign modeTap = state;
 
@@ -86,7 +87,14 @@ module arcfour
     
     logic decryption_success;
 
-    key_generator #(.KEY_UPPER(KEY_UPPER), .KEY_LOWER(KEY_LOWER)) keyGen(
+    key_generator 
+    #(
+        .KEY_LENGTH(KEY_LENGTH),
+        .RAM_WIDTH(RAM_WIDTH),
+        .KEY_UPPER(KEY_UPPER), 
+        .KEY_LOWER(KEY_LOWER)
+    ) keyGen
+    (
         .clk(clk),
         .reset(reset || start_sig),
         .start(keyStart),
@@ -119,6 +127,8 @@ module arcfour
 
 
     ramcontroller #(
+        .RAM_WIDTH(RAM_WIDTH),
+        .RAM_LENGTH(RAM_LENGTH),
         .MESSAGE_LENGTH(MESSAGE_LENGTH),
         .MESSAGE_LOG_LENGTH(MESSAGE_LOG_LENGTH),
         .KEY_LENGTH(KEY_LENGTH)

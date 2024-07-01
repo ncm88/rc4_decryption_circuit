@@ -1,8 +1,8 @@
 //TODO: implement glitch-free streamling
 module ram_initializer
     #(
-        parameter RAM_WIDTH = 8,
-        parameter RAM_LENGTH = 8,
+        parameter RAM_WIDTH,
+        parameter RAM_LENGTH,
         parameter START_INDEX = 0,
         parameter END_INDEX = 255
     )

@@ -1,5 +1,4 @@
 //TODO: multicore and lint
-//TODO: fix hardcoded max key size of 24 bits
 
 
 `default_nettype none
@@ -8,7 +7,9 @@ module ksa
         parameter NUM_CORES = 1,
         parameter MESSAGE_LENGTH = 32,
         parameter MESSAGE_LOG_LENGTH = 5,
-        parameter KEY_LENGTH = 3    //Three byte key assumed by default
+        parameter KEY_LENGTH = 3,    //Three byte key assumed by default
+        parameter RAM_WIDTH = 8,
+        parameter RAM_LENGTH = 8
     )
     (
         input CLOCK_50,
@@ -29,7 +30,6 @@ module ksa
     assign reset = KEY[0]; //keys are active low
     assign start = KEY[1];
 
-
     logic [7:0] sIn;
     logic [7:0] sOut;
     logic [7:0] sAddr;
@@ -42,7 +42,6 @@ module ksa
     logic [7:0] kOut;
     logic [4:0] kAddr;
     
-    
     logic [2:0][7:0] switchKey;
     logic keySel;
     
@@ -53,7 +52,6 @@ module ksa
         .out(keySel)
     );
 
-    //TODO: figure out arcfour start/reset signal characteristics
     assign switchKey = {14'b0, SW[9:0]};
     
     edge_detector reset_detector(
@@ -70,7 +68,7 @@ module ksa
     );
 
     logic success, successOut;
-    logic finished;
+    logic finished, killSignal;
 
     trap_edge trapper(
         .in(success),
@@ -85,6 +83,8 @@ module ksa
 
 
     arcfour #(
+        .RAM_WIDTH(RAM_WIDTH),
+        .RAM_LENGTH(RAM_LENGTH),
         .KEY_LENGTH(KEY_LENGTH),
         .KEY_UPPER(24'hffffff),
         .KEY_LOWER(0),

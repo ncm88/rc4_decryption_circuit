@@ -1,5 +1,7 @@
 module key_generator
     #(
+        parameter KEY_LENGTH,
+        parameter RAM_WIDTH,
         parameter KEY_UPPER,       //operates over [KEY_LOWER, KEY_UPPER] inclusive
         parameter KEY_LOWER
     )
@@ -9,7 +11,7 @@ module key_generator
         input logic start,
         output logic finished,
         output logic terminated,
-        output logic [23:0] key
+        output logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] key
     );
 
     typedef enum logic [4:0] {
@@ -21,7 +23,7 @@ module key_generator
     } state_t;
     state_t state, next_state;
 
-    logic [24:0] next_key;
+    logic [KEY_LENGTH:0][RAM_WIDTH-1:0] next_key; 
 
     assign finished = state[0];
     assign terminated = state[1];
@@ -48,14 +50,13 @@ module key_generator
     end
 
     
-
     always_ff @(posedge clk) begin
         if(reset) begin
             key <= KEY_LOWER;
             state <= AWAIT_START;
         end
         else begin
-            key <= next_key[23:0];
+            key <= next_key[KEY_LENGTH-1:0];
             state <= next_state;
         end
     end

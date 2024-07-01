@@ -2,8 +2,8 @@
 
 module ramcontroller
     #(
-        parameter RAM_WIDTH = 8,
-        parameter RAM_LENGTH = 8,
+        parameter RAM_WIDTH,
+        parameter RAM_LENGTH,
         parameter NUM_DEVICES = 3,
         parameter KEY_LENGTH,
         parameter MESSAGE_LENGTH,
@@ -48,7 +48,10 @@ module ramcontroller
     logic [NUM_DEVICES - 1 : 0] sWrenBus;
 
 
-    ram_initializer initializer(
+    ram_initializer #(
+        .RAM_WIDTH(RAM_WIDTH),
+        .RAM_LENGTH(RAM_LENGTH)
+    ) initializer(
         .clk(clk),
         .reset(reset),
         .start(start_bus[0]),
@@ -59,7 +62,11 @@ module ramcontroller
     );
 
 
-    ram_shuffler shuffler(
+    ram_shuffler #(
+        .RAM_WIDTH(RAM_WIDTH),
+        .RAM_LENGTH(RAM_LENGTH),
+        .KEY_LENGTH(KEY_LENGTH)
+    ) shuffler(
         .clk(clk),
         .reset(reset),
         .start(start_bus[1]),
@@ -73,6 +80,8 @@ module ramcontroller
 
 
     decryptor #(
+        .RAM_WIDTH(RAM_WIDTH),
+        .RAM_LENGTH(RAM_LENGTH),
         .MESSAGE_LENGTH(MESSAGE_LENGTH),
         .MESSAGE_LOG_LENGTH(MESSAGE_LOG_LENGTH)
     ) decryptor
@@ -99,15 +108,8 @@ module ramcontroller
         .wrenTap(wrenTap),
         .success(success)
     );
+    
 
-/*
-    logic[2:0] curr_mode;
-
-    always @(posedge clk) begin
-        curr_mode <= mode;
-    end
-
-*/
     always_comb begin
         case(mode)
 
@@ -142,6 +144,4 @@ module ramcontroller
 
         endcase
     end
-
-
 endmodule

@@ -1,7 +1,7 @@
 module decryptor
     #(
-        parameter RAM_WIDTH = 8,
-        parameter RAM_LENGTH = 8,
+        parameter RAM_WIDTH,
+        parameter RAM_LENGTH,
         parameter MESSAGE_LENGTH,
         parameter MESSAGE_LOG_LENGTH
     )
@@ -29,6 +29,7 @@ module decryptor
         output logic [7:0] stateTap,
         output logic [7:0] siTap,
         output logic [7:0] sjTap,
+        
         output logic wrenTap,
         output logic success
     );
@@ -86,7 +87,6 @@ module decryptor
     assign kTap = k;
 
 
-
     //sAddr and sIn logic
     always_comb begin
         case(state)
@@ -121,8 +121,6 @@ module decryptor
             end
         endcase
     end
-
-
 
 
     edge_detector start_trapper(

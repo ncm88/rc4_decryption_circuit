@@ -13,9 +13,9 @@
 //TODO: Remove redundant states, use glitch-free method
 module ram_shuffler
     #(
-        parameter RAM_WIDTH = 8,
-        parameter RAM_LENGTH = 8,
-        parameter KEY_LENGTH = 3,       //Number of bytes in our key
+        parameter RAM_WIDTH,
+        parameter RAM_LENGTH,
+        parameter KEY_LENGTH,       //Number of bytes in our key
         parameter START_INDEX = 0,
         parameter END_INDEX = 255
     )
