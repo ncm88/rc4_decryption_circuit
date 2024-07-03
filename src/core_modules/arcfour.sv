@@ -16,8 +16,6 @@ module arcfour
         input logic key_select,
 
         input logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] switch_key,
-        output logic arcfour_finished,
-        output logic arcfour_terminated,
 
         /////////////////////////////RAM-S
         output logic sWren,
@@ -33,7 +31,8 @@ module arcfour
         output logic [RAM_WIDTH-1:0] aIn,
         output logic [RAM_LENGTH-1:0] aAddr,
         output logic aWren,
-        output logic success,
+        output logic succeeded,
+        output logic failed,
         /////////////////////////////////TEST
         output logic[7:0]iTap,
         output logic[7:0]jTap,
@@ -44,7 +43,7 @@ module arcfour
         output logic [2:0] fTap,
         output logic [5:0] modeTap,
         output logic wrenTap,
-        output logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] keyTap
+        output logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] outKey
     );
 
 
@@ -54,8 +53,8 @@ module arcfour
         SHUFFLE_RAM = 6'b010_000,
         DECRYPT_RAM = 6'b011_000,
         GET_KEY = 6'b100_001,
-        ARCFOUR_FINISH = 6'b101_010,
-        ARCFOUR_TERMINATE = 6'b110_110
+        ARCFOUR_FAIL = 6'b110_010,
+        ARCFOUR_SUCCESS = 6'b111_100
     } state_t;
     
     state_t state, next_state;
@@ -69,11 +68,10 @@ module arcfour
     );
 
 
-    logic keyStart;
+    logic keyStart, success;
     assign keyStart = state[0];
-    assign arcfour_finished = state[1];
-    assign arcfour_terminated = state[2];
-
+    assign failed = state[1];
+    assign succeeded = state[2];
 
     logic [NUM_DEVICES-1:0] finished;
     logic [NUM_DEVICES-1:0] next_finished;
@@ -81,7 +79,7 @@ module arcfour
 
 
     logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] key, next_key, generator_key;
-    assign keyTap = key;
+    assign outKey = key;
 
     logic key_finish, key_terminate;
     
@@ -177,11 +175,11 @@ module arcfour
 
             SHUFFLE_RAM: next_state = finished[1]? DECRYPT_RAM : SHUFFLE_RAM;
 
-            DECRYPT_RAM: next_state = finished[2]? ((termination_flag || success)? ARCFOUR_TERMINATE : ARCFOUR_FINISH) : DECRYPT_RAM;
+            DECRYPT_RAM: next_state = finished[2]? ((termination_flag || success)? (success? ARCFOUR_SUCCESS : ARCFOUR_FAIL) : GET_KEY) : DECRYPT_RAM;
 
-            ARCFOUR_FINISH: next_state = GET_KEY;
+            ARCFOUR_FAIL: next_state = IDLE;
 
-            ARCFOUR_TERMINATE: next_state = IDLE;
+            ARCFOUR_SUCCESS: next_state = IDLE;
 
             default: next_state = IDLE;
         endcase

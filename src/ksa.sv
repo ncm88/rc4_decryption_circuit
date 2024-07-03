@@ -1,14 +1,14 @@
 `default_nettype none
 module ksa
     #(
-        parameter NUM_CORES = 51,  
+        parameter NUM_CORES = 2,  
         parameter LOG_NUM_CORES = 8,
         parameter MESSAGE_LENGTH = 32,
         parameter MESSAGE_LOG_LENGTH = 5,
         parameter KEY_LENGTH = 3,    //Three byte key assumed by default
         parameter RAM_WIDTH = 8,
         parameter RAM_LENGTH = 8,
-        parameter KEY_MAX = 24'hffffffff
+        parameter KEY_MAX = 24'hffffff
     )
     (
         input CLOCK_50,
@@ -83,6 +83,13 @@ module ksa
 
     logic [NUM_CORES-1:0] success_bus, last_success_bus;
     logic [LOG_NUM_CORES-1:0] core_ptr, next_core_ptr, mapped_core_ptr;
+    logic [NUM_CORES-1:0][KEY_LENGTH*RAM_WIDTH-1:0] keys, next_keys;
+    logic [NUM_CORES-1:0] fail_bus;
+    logic failed, next_failed;
+
+
+    assign next_failed = &fail_bus;
+
 
     logic killSignal, next_killSignal;
     assign next_killSignal = |success_bus;
@@ -102,13 +109,42 @@ module ksa
     bus_lock
     #(
         .BUS_WIDTH(LOG_NUM_CORES)
-    ) lock (
+    ) core_lock (
         .clk(clk),
         .reset(reset_sig),
         .trigger(next_killSignal),
         .inBus(mapped_core_ptr),
         .outBus(core_ptr)
     );
+
+
+    bus_lock
+    #(
+        .BUS_WIDTH(KEY_LENGTH*RAM_WIDTH)
+    ) key_lock (
+        .clk(clk),
+        .reset(reset_sig),
+        .trigger(next_killSignal),
+        .inBus(next_keys),
+        .outBus(keys)
+    );
+
+
+    bus_lock
+    #(
+        .BUS_WIDTH(1'b1)
+    ) fail_lock (
+        .clk(clk),
+        .reset(reset_sig),
+        .trigger(next_killSignal),
+        .inBus(next_failed),
+        .outBus(failed)
+    );
+
+
+
+    logic [KEY_LENGTH*RAM_WIDTH-1:0] curr_key;
+    assign curr_key = keys[core_ptr];
 
 
     always_ff @(posedge clk) begin
@@ -148,7 +184,9 @@ module ksa
                 .aIn(a_in_bus[i]),
                 .aWren(a_wren_bus[i]),
                 .key_select(keySel),
-                .success(success_bus[i])
+                .succeeded(success_bus[i]),
+                .outKey(next_keys[i]),
+                .failed(fail_bus[i])
             );
 
 
@@ -180,9 +218,13 @@ module ksa
 
 //////////////////CORE PTR DISPLAY CODE FOR DEBUG///////////////////////////////////////////////////////////////////////////////////////////////
 
-    
-    SevenSegmentDisplayDecoder decoder (.nIn(core_ptr[3:0]), .ssOut(HEX0));
-    SevenSegmentDisplayDecoder decoder2 (.nIn(core_ptr[7:4]), .ssOut(HEX1));
+    assign LEDR[9:2] = core_ptr;
 
+    SevenSegmentDisplayDecoder decoder (.nIn(curr_key[3:0]), .ssOut(HEX0));
+    SevenSegmentDisplayDecoder decoder2 (.nIn(curr_key[7:4]), .ssOut(HEX1));
+    SevenSegmentDisplayDecoder decoder3 (.nIn(curr_key[11:8]), .ssOut(HEX2));
+    SevenSegmentDisplayDecoder decoder4 (.nIn(curr_key[15:12]), .ssOut(HEX3));
+    SevenSegmentDisplayDecoder decoder5 (.nIn(curr_key[19:16]), .ssOut(HEX4));
+    SevenSegmentDisplayDecoder decoder6 (.nIn(curr_key[23:20]), .ssOut(HEX5));
 
 endmodule
