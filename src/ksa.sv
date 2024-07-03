@@ -1,10 +1,8 @@
-//TODO: multicore and lint
-
-
 `default_nettype none
 module ksa
     #(
-        parameter NUM_CORES = 55,
+        parameter NUM_CORES = 51,  
+        parameter LOG_NUM_CORES = 8,
         parameter MESSAGE_LENGTH = 32,
         parameter MESSAGE_LOG_LENGTH = 5,
         parameter KEY_LENGTH = 3,    //Three byte key assumed by default
@@ -17,32 +15,20 @@ module ksa
         input [3:0] KEY,
         input [9:0] SW,
         output [9:0] LEDR,
-        input [6:0] HEX0,
-        input [6:0] HEX1,
-        input [6:0] HEX2,
-        input [6:0] HEX3,
-        input [6:0] HEX4,
-        input [6:0] HEX5
+        output [6:0] HEX0,
+        output [6:0] HEX1,
+        output [6:0] HEX2,
+        output [6:0] HEX3,
+        output [6:0] HEX4,
+        output [6:0] HEX5
     );
 
-    logic clk, start, reset;
-    logic reset_sig;
+    logic clk, start, reset, reset_sig;
     assign clk = CLOCK_50;
     assign reset = KEY[0]; //keys are active low
     assign start = KEY[1];
 
-    logic [7:0] sIn;
-    logic [7:0] sOut;
-    logic [7:0] sAddr;
-    logic sWren;
 
-    logic [7:0] aIn;
-    logic [7:0] aAddr;
-    logic aWren;
-
-    logic [7:0] kOut;
-    logic [4:0] kAddr;
-    
     logic [2:0][7:0] switchKey;
     logic keySel;
     
@@ -68,22 +54,20 @@ module ksa
         .out(clear_start)
     );
 
-    logic success, successOut;
-    logic finished;
+    logic successOut;
 
     trap_edge trapper(
         .in(next_killSignal),
         .clk(clk),
-        .reset(clear_start), 
+        .reset(clear_start || reset_sig), 
         .out(successOut)
     );
 
-    assign LEDR[0] = finished;
-    assign LEDR[1] = successOut;
-    assign LEDR[2] = keySel;
+    assign LEDR[0] = successOut;
+    assign LEDR[1] = keySel;
 
 
-    ///////////////////////////////////////////////////////////PARALLELIZATION BLOCK///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////PARALLELIZATION BLOCK///////////////////////////////////////////////////////////////////////////////////////////////////////
 
     logic [NUM_CORES-1:0] s_wren_bus;                       //Bussin'
     logic [NUM_CORES-1:0][RAM_LENGTH-1:0] s_addr_bus;
@@ -97,16 +81,43 @@ module ksa
     logic [NUM_CORES-1:0][MESSAGE_LOG_LENGTH-1:0] k_addr_bus;
     logic [NUM_CORES-1:0][RAM_WIDTH-1:0] k_out_bus;
 
-    logic [NUM_CORES-1:0] success_bus;
-    
+    logic [NUM_CORES-1:0] success_bus, last_success_bus;
+    logic [LOG_NUM_CORES-1:0] core_ptr, next_core_ptr, mapped_core_ptr;
 
     logic killSignal, next_killSignal;
     assign next_killSignal = |success_bus;
-    always_ff @(posedge clk) begin
-        if(reset_sig) killSignal <= 1;
-        else killSignal <= next_killSignal;
-    end
 
+
+
+    first_bit_detector 
+    #(
+        .BUS_WIDTH(NUM_CORES),
+        .LOG_BUS_WIDTH(LOG_NUM_CORES)
+    ) core_detector (
+        .bus(success_bus), 
+        .addr(mapped_core_ptr)
+    );
+
+
+    bus_lock
+    #(
+        .BUS_WIDTH(LOG_NUM_CORES)
+    ) lock (
+        .clk(clk),
+        .reset(reset_sig),
+        .trigger(next_killSignal),
+        .inBus(mapped_core_ptr),
+        .outBus(core_ptr)
+    );
+
+
+    always_ff @(posedge clk) begin
+        if(reset_sig) begin
+            killSignal <= 1;
+        end begin
+            killSignal <= next_killSignal;
+        end
+    end
 
     localparam k = KEY_MAX/NUM_CORES;
 
@@ -126,7 +137,7 @@ module ksa
                 .clk(clk),
                 .reset(killSignal),
                 .switch_key(switchKey),
-                .start(start),
+                .start(clear_start),
                 .sIn(s_in_bus[i]),
                 .sAddr(s_addr_bus[i]),
                 .sWren(s_wren_bus[i]),
@@ -166,6 +177,12 @@ module ksa
 
         end
     endgenerate
+
+//////////////////CORE PTR DISPLAY CODE FOR DEBUG////////////////////////////////////////////
+
+    
+    SevenSegmentDisplayDecoder decoder (.nIn(core_ptr[3:0]), .ssOut(HEX0));
+    SevenSegmentDisplayDecoder decoder2 (.nIn(core_ptr[7:4]), .ssOut(HEX1));
 
 
 endmodule
