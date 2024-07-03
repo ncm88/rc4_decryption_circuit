@@ -1,4 +1,4 @@
-module edge_detector
+module edge_detector       
     (
         input logic clk,
         input logic in,
