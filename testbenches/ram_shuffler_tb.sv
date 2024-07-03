@@ -10,13 +10,13 @@ module ram_shuffler_tb();
     logic [7 : 0] address;
     logic [7:0] iTap;
     logic [7:0] jTap;
-    logic [1:0] stateTap;
+    logic [4:0] stateTap;
     logic [7:0] siTap;
     logic [7:0] sjTap;
     logic readTap;
     logic writeTap;
     
-    ram_shuffler shuffler(
+    ram_shuffler #(.RAM_LENGTH(8'd8), .RAM_WIDTH(8'd8), .KEY_LENGTH(8'd3)) shuffler(
         .clk(clk),
         .reset(reset),
         .start(start),
@@ -30,15 +30,12 @@ module ram_shuffler_tb();
         .jTap(jTap),
         .stateTap(stateTap),
         .siTap(siTap),
-        .sjTap(sjTap),
-        .readTap(readTap),
-        .writeTap(writeTap)
+        .sjTap(sjTap)
     );
 
 
     assign key = 1;
-    assign ram_out = 0;
-
+    assign ram_out = 8'b01000000;
 
     always begin
         #5;

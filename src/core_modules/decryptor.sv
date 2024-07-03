@@ -1,3 +1,16 @@
+/*
+RC4 Decryption Algo: 
+
+i = 0, j=0
+for k = 0 to message_length-1 { 
+    i = (i+1) mod 256
+    j = (j+s[i]) mod 256
+    swap values of s[i] and s[j]
+    f = s[ (s[i]+s[j]) mod 256 ]
+    decrypted_output[k] = f xor encrypted_input[k] 
+}
+*/
+
 module decryptor
     #(
         parameter RAM_WIDTH,
