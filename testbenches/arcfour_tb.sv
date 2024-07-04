@@ -37,7 +37,7 @@ module arcfour_tb();
 
 
     logic key_select;
-    assign key_select = 1'b1;
+    assign key_select = 1'b0;
 
 
     arcfour #(
@@ -67,7 +67,7 @@ module arcfour_tb();
         
         .kOut(kOut),
         .kAddr(kAddr),
-
+        .outKey(keyTap),
         .aWren(aWren),
         .aIn(aIn),
         

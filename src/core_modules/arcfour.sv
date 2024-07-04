@@ -61,7 +61,6 @@ module arcfour
     } state_t;
     
     state_t state, next_state;
-    //assign modeTap = state;
 
     logic start_sig;
     edge_detector detector(
@@ -78,7 +77,6 @@ module arcfour
 
     logic [NUM_DEVICES-1:0] finished;
     logic [NUM_DEVICES-1:0] next_finished;
-    assign fTap = finished;
 
 
     logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] key, next_key, generator_key;
@@ -160,6 +158,9 @@ module arcfour
         */
         .success(decryption_success)
     );
+
+    //assign modeTap = state;
+    //assign fTap = finished;
 
     always_ff @(posedge clk) begin 
         if(reset) success <= 0;

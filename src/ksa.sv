@@ -3,11 +3,11 @@
 `default_nettype none
 module ksa
     #(
-        parameter NUM_CORES = 2,  
+        parameter NUM_CORES = 69,  
         parameter LOG_NUM_CORES = 8,
         parameter MESSAGE_LENGTH = 32,
         parameter MESSAGE_LOG_LENGTH = 5,
-        parameter KEY_LENGTH = 3,    //Three byte key assumed by default
+        parameter KEY_LENGTH = 3,    //Counts number of bytes in key
         parameter RAM_WIDTH = 8,
         parameter RAM_LENGTH = 8,
         parameter KEY_MAX = 24'hffffff
@@ -32,7 +32,7 @@ module ksa
 
     logic [2:0][7:0] switchKey;
     logic keySel;
-    assign switchKey = 24'h3fffff;//{14'b0, SW[9:0]};
+    assign switchKey = {14'b0, SW[9:0]};     //24'h3fffff;
     assign LEDR[6] = keySel;
     
 
@@ -60,7 +60,7 @@ module ksa
     logic start_bit, reset_bit, finish_bit, success_bit, fail_bit, clear_retrieval;
     typedef enum logic[7:0]{
         IDLE = 8'b00_000110,
-        RUNNING = 8'b01_100001,
+        RUNNING = 8'b01_100001,     //clear retrieval may be causing some issues
         SUCCESS = 8'b10_001100,
         FAIL = 8'b11_010100
     }state_t;
@@ -92,11 +92,11 @@ module ksa
 
     logic [NUM_CORES-1:0] success_bus, term_bus;
     logic [LOG_NUM_CORES-1:0] core_ptr, mapped_core_ptr;
-    logic [NUM_CORES-1:0][KEY_LENGTH*RAM_WIDTH-1:0] keys, next_keys;
+    logic [NUM_CORES-1:0][KEY_LENGTH*RAM_WIDTH-1:0] keys;
 
+    
 
-
-    logic success_sig, term_sig;
+    logic success_sig, term_sig;        //Register these next
     assign success_sig = |success_bus;
     assign term_sig = &term_bus;
 
@@ -111,6 +111,27 @@ module ksa
     );
 
 
+    logic [KEY_LENGTH*RAM_WIDTH-1:0] curr_key;
+    
+    
+    core_pull #(
+        .RAM_WIDTH(RAM_WIDTH),
+        .KEY_LENGTH(KEY_LENGTH),
+        .NUM_CORES(NUM_CORES),
+        .LOG_NUM_CORES(LOG_NUM_CORES)
+    ) CP (
+        .clk(clk),
+        .reset(clear_retrieval),
+        .enable(finish_bit),
+        .addr(mapped_core_ptr),
+        .keys(keys),
+        .out_key(curr_key),
+        .out_addr(core_ptr)
+    );
+
+
+
+/*
     bus_lock
     #(
         .BUS_WIDTH(LOG_NUM_CORES)
@@ -136,7 +157,7 @@ module ksa
     logic [KEY_LENGTH*RAM_WIDTH-1:0] curr_key;
     assign curr_key = keys[core_ptr];
     
-
+    */
 
     localparam k = KEY_MAX/NUM_CORES;
 
@@ -168,7 +189,7 @@ module ksa
                 .aWren(a_wren_bus[i]),
                 .key_select(keySel),
                 .succeeded(success_bus[i]),
-                .outKey(next_keys[i]),
+                .outKey(keys[i]),
                 .terminated(term_bus[i])
             );
 
