@@ -30,8 +30,8 @@ module ramcontroller
         output logic [RAM_WIDTH-1:0] aIn,
         output logic [RAM_LENGTH-1:0] aAddr,
         output logic aWren,
-        output logic success,
-
+        output logic success
+        /*
         output logic[7:0]iTap,          //TEST
         output logic[7:0]jTap,
         output logic[7:0]siTap,
@@ -39,6 +39,7 @@ module ramcontroller
         output logic[7:0]kTap,
         output logic [7:0] stateTap,
         output logic wrenTap
+        */
     );
 
 
@@ -99,6 +100,8 @@ module ramcontroller
         .kOut(kOut),
         .kAddr(kAddr),
         .finished(finish_bus[2]),
+        
+        /*
         .iTap(iTap),
         .jTap(jTap),
         .kTap(kTap),
@@ -106,6 +109,8 @@ module ramcontroller
         .sjTap(sjTap),
         .stateTap(stateTap),
         .wrenTap(wrenTap),
+        */
+
         .success(success)
     );
     

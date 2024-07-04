@@ -4,7 +4,7 @@ module ram_initializer
         parameter RAM_WIDTH,
         parameter RAM_LENGTH,
         parameter START_INDEX = 0,
-        parameter END_INDEX = 255
+        parameter END_INDEX = 8'd255
     )
     (
         input logic clk,

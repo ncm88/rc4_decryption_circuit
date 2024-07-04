@@ -11,8 +11,8 @@ module arcfour_tb();
     logic [7:0] aAddr;
     logic aWren;
 
-    logic arcfour_finished;
-    logic arcfour_terminated;
+    logic succeeded;
+    logic terminated;
 
     logic clk;
     logic [7:0] state;
@@ -37,18 +37,28 @@ module arcfour_tb();
 
 
     logic key_select;
-    assign key_select = 1'b0;
+    assign key_select = 1'b1;
 
 
-    arcfour RC(
+    arcfour #(
+        .RAM_WIDTH(8),
+        .RAM_LENGTH(8),
+        .KEY_LENGTH(3),
+        .MESSAGE_LENGTH(32),
+        .MESSAGE_LOG_LENGTH(5),
+        .KEY_UPPER(24'hffffff),
+        .KEY_LOWER(0)
+    ) RC
+    (
         .clk(clk),
         .reset(reset),
         .switch_key(key),
         .start(start),
-        .arcfour_finished(arcfour_finished),
-        .arcfour_terminated(arcfour_terminated),
+
+        .succeeded(succeeded),
+        .terminated(terminated),
+
         .key_select(key_select),
-        .keyTap(keyTap),
 
         .sOut(sOut),
         .sWren(sWren),
@@ -60,8 +70,8 @@ module arcfour_tb();
 
         .aWren(aWren),
         .aIn(aIn),
-        .aAddr(aAddr),
         
+        /*
         .stateTap(state),
         .kTap(kTap),
         .iTap(iTap),
@@ -71,6 +81,10 @@ module arcfour_tb();
         .fTap(fTap),
         .modeTap(modeTap),
         .wrenTap(wrenTap)
+        */
+
+        .aAddr(aAddr)
+
     );
 
 

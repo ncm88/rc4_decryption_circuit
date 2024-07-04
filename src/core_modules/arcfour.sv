@@ -32,8 +32,9 @@ module arcfour
         output logic [RAM_LENGTH-1:0] aAddr,
         output logic aWren,
         output logic succeeded,
-        output logic failed,
+        output logic terminated,
         /////////////////////////////////TEST
+        /*
         output logic[7:0]iTap,
         output logic[7:0]jTap,
         output logic[7:0]siTap,
@@ -43,6 +44,8 @@ module arcfour
         output logic [2:0] fTap,
         output logic [5:0] modeTap,
         output logic wrenTap,
+        */
+
         output logic [KEY_LENGTH-1:0][RAM_WIDTH-1:0] outKey
     );
 
@@ -54,11 +57,11 @@ module arcfour
         DECRYPT_RAM = 6'b011_000,
         GET_KEY = 6'b100_001,
         ARCFOUR_FAIL = 6'b110_010,
-        ARCFOUR_SUCCESS = 6'b111_100
+        ARCFOUR_SUCCESS = 6'b111_110
     } state_t;
     
     state_t state, next_state;
-    assign modeTap = state;
+    //assign modeTap = state;
 
     logic start_sig;
     edge_detector detector(
@@ -70,7 +73,7 @@ module arcfour
 
     logic keyStart, success;
     assign keyStart = state[0];
-    assign failed = state[1];
+    assign terminated = state[1];
     assign succeeded = state[2];
 
     logic [NUM_DEVICES-1:0] finished;
@@ -146,6 +149,7 @@ module arcfour
         .aIn(aIn),
         .aWren(aWren),
         .key(key),
+        /*
         .iTap(iTap),
         .jTap(jTap),
         .siTap(siTap),
@@ -153,6 +157,7 @@ module arcfour
         .stateTap(stateTap),
         .kTap(kTap),
         .wrenTap(wrenTap),
+        */
         .success(decryption_success)
     );
 

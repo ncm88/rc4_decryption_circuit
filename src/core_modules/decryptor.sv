@@ -36,14 +36,16 @@ module decryptor
         output logic [MESSAGE_LOG_LENGTH-1:0] kAddr,
         output logic finished,
 
+        /*
         output logic [7:0] iTap,
         output logic [7:0] jTap,
         output logic [7:0] kTap,
         output logic [7:0] stateTap,
         output logic [7:0] siTap,
         output logic [7:0] sjTap,
-        
         output logic wrenTap,
+        */
+
         output logic success
     );
 
@@ -52,7 +54,6 @@ module decryptor
     logic [RAM_LENGTH-1:0] i, j, next_i, next_j;
     logic [MESSAGE_LOG_LENGTH-1:0] k, next_k;
 
-    assign wrenTap = sWren;
 
     typedef enum logic [7:0] { 
         AWAIT_START = 8'b000_00000,
@@ -91,14 +92,16 @@ module decryptor
     end
 
 
-    //////////////////////////TEST////////////////////////////
+    //////////////////////////TEST//////////////////////////// 
+    /*
     assign siTap = si;
     assign sjTap = sj;
     assign iTap = i;
     assign jTap = j;
     assign stateTap = state;
     assign kTap = k;
-
+    assign wrenTap = sWren;
+    */
 
     //sAddr and sIn logic
     always_comb begin

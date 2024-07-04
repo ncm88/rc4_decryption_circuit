@@ -84,7 +84,7 @@ module romcore (
 		altsyncram_component.address_aclr_a = "NONE",
 		altsyncram_component.clock_enable_input_a = "BYPASS",
 		altsyncram_component.clock_enable_output_a = "BYPASS",
-		altsyncram_component.init_file = "../secret_messages/msg_1_for_task2b/message.mif",
+		altsyncram_component.init_file = "../secret_messages/msg_8_for_task3/message.mif",
 		altsyncram_component.intended_device_family = "Cyclone V",
 		altsyncram_component.lpm_hint = "ENABLE_RUNTIME_MOD=YES,INSTANCE_NAME=ROMX",
 		altsyncram_component.lpm_type = "altsyncram",
