@@ -33,7 +33,6 @@ module ksa
     logic [2:0][7:0] switchKey;
     logic keySel;
     assign switchKey = {14'b0, SW[9:0]};     //24'h3fffff;
-    assign LEDR[6] = keySel;
     
 
     key_toggle toggler(
@@ -57,22 +56,19 @@ module ksa
     );
 
 
-    logic start_bit, reset_bit, finish_bit, success_bit, fail_bit, clear_retrieval;
-    typedef enum logic[7:0]{
-        IDLE = 8'b00_000110,
-        RUNNING = 8'b01_100001,     //clear retrieval may be causing some issues
-        SUCCESS = 8'b10_001100,
-        FAIL = 8'b11_010100
+    logic start_bit, reset_bit, finish_bit, success_bit;
+    typedef enum logic[5:0]{
+        FAIL_OR_IDLE = 6'b00_0100,
+        RUNNING = 6'b01_0001,     //clear retrieval may be causing some issues
+        SUCCESS = 6'b10_1100,
+        RESET = 6'b11_0010
     }state_t;
     state_t state, next_state;
 
-
     assign start_bit = state[0];
     assign reset_bit = state[1];
-    assign finish_bit = state[2];   //Serves as critical section permission indicator to HPS
+    assign finish_bit = state[2];
     assign success_bit = state[3];
-    assign fail_bit = state[4];
-    assign clear_retrieval = state[5];
 
 
 
@@ -90,77 +86,64 @@ module ksa
     logic [NUM_CORES-1:0][MESSAGE_LOG_LENGTH-1:0] k_addr_bus;
     logic [NUM_CORES-1:0][RAM_WIDTH-1:0] k_out_bus;
 
-    logic [NUM_CORES-1:0] success_bus, term_bus;
+    logic [NUM_CORES-1:0] success_bus, registered_success_bus, term_bus;
     logic [LOG_NUM_CORES-1:0] core_ptr, mapped_core_ptr;
-    logic [NUM_CORES-1:0][KEY_LENGTH*RAM_WIDTH-1:0] keys;
+    logic [NUM_CORES-1:0][KEY_LENGTH*RAM_WIDTH-1:0] keys, curr_keys;
 
     
-
-    logic success_sig, term_sig;        //Register these next
+    logic success_sig, term_sig, kill_sig;        //Register these next
     assign success_sig = |success_bus;
     assign term_sig = &term_bus;
+    assign kill_sig = success_sig || term_sig;
 
-    
+
+    bus_lock
+    #(
+        .BUS_WIDTH(NUM_CORES)
+    ) success_lock (
+        .clk(clk),
+        .reset(reset_bit),
+        .enable(start_bit),
+        .inBus(success_bus),
+        .outBus(registered_success_bus)
+    );
+
+
+    bus_lock
+    #(
+        .BUS_WIDTH(NUM_CORES*KEY_LENGTH*RAM_WIDTH)
+    ) key_lock (
+        .clk(clk),
+        .reset(reset_bit),
+        .enable(start_bit),
+        .inBus(keys),
+        .outBus(curr_keys)
+    );
+
+
     first_bit_detector 
     #(
         .BUS_WIDTH(NUM_CORES),
         .LOG_BUS_WIDTH(LOG_NUM_CORES)
     ) core_detector (
-        .bus(success_bus), 
+        .bus(registered_success_bus), 
         .addr(mapped_core_ptr)
     );
 
 
-    logic [KEY_LENGTH*RAM_WIDTH-1:0] curr_key;
-    
-    
-    core_pull #(
-        .RAM_WIDTH(RAM_WIDTH),
-        .KEY_LENGTH(KEY_LENGTH),
-        .NUM_CORES(NUM_CORES),
-        .LOG_NUM_CORES(LOG_NUM_CORES)
-    ) CP (
-        .clk(clk),
-        .reset(clear_retrieval),
-        .enable(finish_bit),
-        .addr(mapped_core_ptr),
-        .keys(keys),
-        .out_key(curr_key),
-        .out_addr(core_ptr)
-    );
+    logic finish_sig_out, success_sig_out;
+    always_ff @(posedge clk) begin
+        if(reset_bit) core_ptr <= 0;
+        else core_ptr <= mapped_core_ptr;
+        finish_sig_out <= finish_bit;
+        success_sig_out <= success_bit;
+    end
 
-
-
-/*
-    bus_lock
-    #(
-        .BUS_WIDTH(LOG_NUM_CORES)
-    ) core_lock (
-        .clk(clk),
-        .reset(clear_retrieval),
-        .trigger(finish_bit),
-        .inBus(mapped_core_ptr),
-        .outBus(core_ptr)
-    );
-
-
-    bus_lock
-    #(
-        .BUS_WIDTH(KEY_LENGTH*RAM_WIDTH)
-    ) key_lock (
-        .clk(clk),
-        .reset(clear_retrieval),
-        .trigger(finish_bit),
-        .inBus(next_keys),
-        .outBus(keys)
-    );
     logic [KEY_LENGTH*RAM_WIDTH-1:0] curr_key;
     assign curr_key = keys[core_ptr];
-    
-    */
+
 
     localparam k = KEY_MAX/NUM_CORES;
-
     genvar i;
     generate
         for(i = 0; i < NUM_CORES; i = i + 1) begin : core_generate
@@ -225,17 +208,17 @@ module ksa
 
     always_comb begin
         case(state)
-            IDLE: next_state = start_sig? RUNNING : IDLE;
-            RUNNING: next_state = success_sig? SUCCESS : (term_sig? FAIL : RUNNING);
-            FAIL: next_state = start_sig? RUNNING : FAIL;
+            FAIL_OR_IDLE: next_state = start_sig? RUNNING : FAIL_OR_IDLE;
+            RUNNING: next_state = kill_sig? (success_sig? SUCCESS : FAIL_OR_IDLE) : RUNNING;
             SUCCESS: next_state = start_sig? RUNNING : SUCCESS;
-            default: next_state = IDLE;
+            RESET: next_state = FAIL_OR_IDLE;
+            default: next_state = FAIL_OR_IDLE;
         endcase
     end
 
 
     always_ff @(posedge clk) begin
-        if(reset_sig) state <= IDLE;
+        if(reset_sig) state <= RESET;
         else state <= next_state;
     end
 
@@ -243,7 +226,10 @@ module ksa
 
 /////////////////////////////////////////////////////////////////////DEBUG///////////////////////////////////////////////////////////////////////////////////////////////
 
-    assign LEDR[5:0] = state[5:0];
+    assign LEDR[0] = keySel;
+    assign LEDR[1] = finish_sig_out;
+    assign LEDR[2] = success_sig_out;
+    assign LEDR[9:3] = core_ptr[7:0];
 
     SevenSegmentDisplayDecoder decoder (.nIn(curr_key[3:0]), .ssOut(HEX0));
     SevenSegmentDisplayDecoder decoder2 (.nIn(curr_key[7:4]), .ssOut(HEX1));

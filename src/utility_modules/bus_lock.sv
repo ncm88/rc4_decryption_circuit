@@ -6,17 +6,15 @@ module bus_lock
     (
         input logic clk, 
         input logic reset, 
-        input logic trigger,
+        input logic enable,
         input logic [BUS_WIDTH-1:0] inBus,
         output logic [BUS_WIDTH-1:0] outBus
     );
 
-    logic[BUS_WIDTH-1:0] next_bus;
-    assign next_bus = trigger? inBus : outBus;
-
     always_ff @(posedge clk) begin
         if(reset) outBus <= 0;
-        else outBus <= next_bus;  
+        else if(enable) outBus <= inBus;
+        else outBus <= outBus;  
     end
 
 endmodule
