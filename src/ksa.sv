@@ -1,9 +1,7 @@
-//TODO: fix keygen->broken switchkey runlock bug
-
 `default_nettype none
 module ksa
     #(
-        parameter NUM_CORES = 69,  
+        parameter NUM_CORES = 51,  
         parameter LOG_NUM_CORES = 8,
         parameter MESSAGE_LENGTH = 32,
         parameter MESSAGE_LOG_LENGTH = 5,
