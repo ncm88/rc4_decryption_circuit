@@ -272,17 +272,14 @@ The next step here is to replace the ciphertext message memory with something th
 
 
 ## Inter-FSM Communication 
-
+A simple start-finish protocol is used for all inter-fsm communication. Each fsm is started by the rising edge of its respective start signal and starts any other sub-fsm by the same method. Upon termination a finish signal is yielded to the caller for one clock period and the fsm re-enters an idle state thereafter. With the exception of `key_generator`, all fsms have no recollection of the previous call after termination, this allows for minimal reset logic to be used outside of the explicit reset case.
 
 
 
 ## Need For Pipelining
+During testing, an issue came up where the device's key acquisition seemed to work fine for a small numbers of cores but failed for larger numbers of cores. The issue was due to delays induced by two peices of combinational logic:
+1. Identifying the index of the first high bit of `success_bus` and mapping that address to `core_ptr`
+2. Using that `core_ptr` to access the appropriate key at that time via the `keys` bus
 
-## Parameterization
+For high core counts both of these busses are quite large resulting in a very large CL delay that exceeds the clock period, thus inappropriate keys are returned. To combat this, pipelining was used where both `core_ptr` and `keys` are registered separately before being driven through the lookup CL. This allows a higher clock frequency to be used in the rest of the circuit.
 
-## Testbench Design
-
-
-
-<br></br>
-# Project Summary and Next Steps
