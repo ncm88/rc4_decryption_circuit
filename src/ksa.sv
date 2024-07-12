@@ -141,7 +141,7 @@ module ksa
     assign curr_key = keys[core_ptr];
 
 
-    localparam k = KEY_MAX/NUM_CORES;
+    localparam k = (KEY_MAX+1)/NUM_CORES;
     genvar i;
     generate
         for(i = 0; i < NUM_CORES; i = i + 1) begin : core_generate
